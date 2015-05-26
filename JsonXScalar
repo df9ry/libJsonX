@@ -16,36 +16,55 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JSONXATOM_H_
-#define JSONXATOM_H_
+#ifndef JSONXSCALAR_
+#define JSONXSCALAR_
 
-#include "JsonXValue.h"
+#include "JsonXNumber.h"
 
 namespace JsonX {
 
 /**
- * Base class for atomic values.
+ * Template for all scalr atoms, like integers and reals
  */
-class JsonXAtom: public JsonXValue {
+template <typename T, ValueType V>
+class JsonXScalar: public JsonXNumber {
 public:
+	/**
+	 * Constructor.
+	 * @param value The value
+	 */
+	JsonXScalar(T value): m_value{value} {};
+
+	/**
+	 * Destructor
+	 */
+	virtual ~JsonXScalar() {};
+
 	/**
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const = 0;
+	virtual std::string&& toString() const {
+		std::string&& s{std::to_string(m_value)};
+		return move(s);
+	}
 
 	/**
 	 * Get type of this value, so RTTI is not required.
 	 * @return Type of this value
 	 */
-	virtual ValueType type() const = 0;
+	virtual ValueType type() const { return V; }
 
 	/**
-	 * Destructor
+	 * Get value.
+	 * @return value
 	 */
-	virtual ~JsonXAtom();
+	T value() const { return m_value; }
+
+private:
+	T m_value;
 };
 
 } /* namespace JsonX */
 
-#endif /* JSONXATOM_H_ */
+#endif /* JSONXSCALAR_ */

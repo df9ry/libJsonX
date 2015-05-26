@@ -19,11 +19,11 @@
 #ifndef JSONXSTRING_H_
 #define JSONXSTRING_H_
 
-#include "JsonXAtom.h"
+#include "JsonXValue.h"
 
 namespace JsonX {
 
-class JsonXString: public JsonXAtom {
+class JsonXString: public JsonXValue {
 public:
 	/**
 	 * Constructor.
@@ -32,10 +32,13 @@ public:
 	JsonXString(const std::string& value);
 
 	/**
-	 * Constructor with move semantic.
+	 * Helper function to make inline coding easier.
 	 * @param value The string value
+	 * @return New JsonXString on the heap
 	 */
-	JsonXString(std::unique_ptr<std::string>&& value);
+	JsonXString* make(const std::string& value) {
+		return new JsonXString(value);
+	}
 
 	/**
 	 * Destructor
@@ -49,34 +52,13 @@ public:
 	virtual std::string&& toString() const;
 
 	/**
-	 * Get type of this value, so RTTI is not required.
-	 * @return Type of this value
-	 */
-	virtual ValueType type() const { return ValueType::T_STRING; }
-
-	/**
-	 * Get value.
-	 * @return value
-	 */
-	const std::string& value() const { return *m_value.get(); }
-
-	/**
-	 * Get value with move semantic.
-	 * @return value
-	 */
-	std::unique_ptr<std::string>&& value() { return std::move(m_value); }
-
-	/**
 	 * Read a string object from input stream. It must be known that
 	 * there really is a string, so the first character have to be
 	 * a '"'.
 	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXString
+	 * @return New JsonXString on the heap
 	 */
-	static std::unique_ptr<JsonXString>&& read(std::istream& iss) {
-	    return move(std::unique_ptr<JsonXString>(
-	    		new JsonXString(move(readRaw(iss)))));
-	}
+	static JsonXString* read(std::istream& iss);
 
 	/**
 	 * Read a json coded string from input stream. It must be known
@@ -94,8 +76,20 @@ public:
 	 */
 	static std::string&& toJson(const std::string& s);
 
+	/**
+	 * Get type of this value, so RTTI is not required.
+	 * @return Type of this value
+	 */
+	virtual ValueType type() const { return ValueType::T_STRING; }
+
+	/**
+	 * Get value.
+	 * @return value
+	 */
+	const std::string& value() const { return m_value; }
+
 private:
-	std::unique_ptr<std::string> m_value;
+	const std::string m_value;
 };
 
 } /* namespace JsonX */

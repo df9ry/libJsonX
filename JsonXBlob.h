@@ -19,36 +19,85 @@
 #ifndef JSONXBLOB_H_
 #define JSONXBLOB_H_
 
-#include "JsonXAtom.h"
+#include "JsonXValue.h"
 
 #include <vector>
+#include <memory>
 
 namespace JsonX {
 
-class JsonXBlob: public JsonXAtom {
+using JsonXBlobData = typename std::vector<uint8_t>;
+
+class JsonXBlob: public JsonXValue {
 public:
+
+	/**
+	 * Default constructor.
+	 */
+	JsonXBlob();
+
 	/**
 	 * Constructor.
 	 * @param value The blob value
 	 */
-	JsonXBlob(const std::vector<uint8_t>& value);
+	JsonXBlob(const JsonXBlobData& value);
 
 	/**
-	 * Constructor with move semantic.
+	 * Constructor with move.
 	 * @param value The blob value
 	 */
-	JsonXBlob(std::unique_ptr<std::vector<uint8_t>>&& value);
+	JsonXBlob(JsonXBlobData&& value);
+
+	/**
+	 * Support for initializer list
+	 * @param il byte values
+	 */
+	JsonXBlob(std::initializer_list<uint8_t> il);
+
+	/**
+	 * Make an new blob on the heap.
+	 * @param value The blob value
+	 * @return Pointer to object on the heap
+	 */
+	static inline JsonXBlob* make(const JsonXBlobData& value)
+	{ return new JsonXBlob(value); }
+
+	 /**
+	 * @param il Byte list
+	 * @return New blob on the heap
+	 */
+	static inline JsonXBlob* make(std::initializer_list<uint8_t> il)
+	{ return new JsonXBlob(il); }
+
+	/**
+	 * Add byte to the blob
+	 * @param x Byte to add
+	 * @return Pointer to itself to allow chaining
+	 */
+	inline JsonXBlob* add(uint8_t x) {
+		m_value.get()->push_back(x);
+		return this;
+	}
 
 	/**
 	 * Destructor
 	 */
-	virtual ~JsonXBlob() {};
+	virtual ~JsonXBlob();
 
 	/**
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
 	virtual std::string&& toString() const;
+
+	/**
+	 * Read a blob object from input stream. It must be known that
+	 * there really is a blob, so the first character have to be
+	 * a '='.
+	 * @param iss The input stream to read from
+	 * @return New JsonXBlob on the heap
+	 */
+	static JsonXBlob* read(std::istream& iss);
 
 	/**
 	 * Get type of this value, so RTTI is not required.
@@ -60,25 +109,16 @@ public:
 	 * Get value.
 	 * @return value
 	 */
-	const std::vector<uint8_t>& value() const { return *m_value.get(); }
+	const JsonXBlobData& value() const { return *m_value.get(); }
 
 	/**
-	 * Get value with move semantic.
+	 * Get value.
 	 * @return value
 	 */
-	std::unique_ptr<std::vector<uint8_t>>&& value() { return std::move(m_value); }
-
-	/**
-	 * Read a blob object from input stream. It must be known that
-	 * there really is a blob, so the first character have to be
-	 * a '='.
-	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXBlob
-	 */
-	static std::unique_ptr<JsonXBlob>&& read(std::istream& iss);
+	JsonXBlobData&& value() { return move(*m_value.get()); }
 
 private:
-	std::unique_ptr<std::vector<uint8_t>> m_value;
+	std::unique_ptr<JsonXBlobData>&& m_value;
 };
 
 } /* namespace JsonX */

@@ -25,12 +25,14 @@ namespace JsonX {
 
 JsonXBool::JsonXBool(bool value): m_value{value} {}
 
+JsonXBool::~JsonXBool() {}
+
 string&& JsonXBool::toString() const {
 	string&& s{m_value ? "true" : "false"};
 	return move(s);
 }
 
-unique_ptr<JsonXBool>&& JsonXBool::read(istream& iss) {
+JsonXBool* JsonXBool::read(istream& iss) {
     skipWhitespace(iss);
     bool value;
     if (iss.peek() == 't') {
@@ -51,7 +53,7 @@ unique_ptr<JsonXBool>&& JsonXBool::read(istream& iss) {
 		)) throw JsonXException("Invalid false symbol");
 		value = false;
     }
-    return move(unique_ptr<JsonXBool>(new JsonXBool(value)));
+    return new JsonXBool(value);
 }
 
 } /* namespace JsonX */

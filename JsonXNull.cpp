@@ -25,12 +25,14 @@ namespace JsonX {
 
 JsonXNull::JsonXNull() {}
 
+JsonXNull::~JsonXNull() {}
+
 string&& JsonXNull::toString() const {
 	string&& s{"null"};
 	return move(s);
 }
 
-unique_ptr<JsonXNull>&& JsonXNull::read(istream& iss) {
+JsonXNull* JsonXNull::read(istream& iss) {
     skipWhitespace(iss);
     if (!(
         (readChar(iss) == 'n') &&
@@ -39,7 +41,7 @@ unique_ptr<JsonXNull>&& JsonXNull::read(istream& iss) {
         (readChar(iss) == 'l')
         ))
         throw JsonXException("Invalid null symbol");
-    return move(unique_ptr<JsonXNull>(new JsonXNull()));
+    return new JsonXNull();
 }
 
 } /* namespace JsonX */

@@ -27,19 +27,39 @@ using namespace std;
 
 namespace JsonX {
 
+JsonXArray::JsonXArray(): m_value{
+	unique_ptr<JsonXArrayData>(new JsonXArrayData())} {}
+
+JsonXArray::JsonXArray(initializer_list<JsonXValue*> il):
+	m_value{unique_ptr<JsonXArrayData>(new JsonXArrayData(il.size()))}
+{
+	uninitialized_copy(il.begin(), il.begin() + il.size(),
+			m_value.get()->begin());
+}
+
+JsonXArray::~JsonXArray() {}
+
+JsonXArray* JsonXArray::add(JsonXValue* v) {
+	value().push_back(unique_ptr<JsonXValue>{move(v)});
+	return this;
+}
+
 string&& JsonXArray::toString() const {
 	ostringstream oss{};
 	bool first{true};
 	oss << '[';
-	for (uint i = 0; i < m_value.size(); ++i) {
+	for (JsonXArrayData::const_iterator i = value().begin();
+			i != value().end(); ++i)
+	{
 		if (first) first = false; else oss << ',';
-		oss << m_value[i]->toString();
+		JsonXValue* v{i->get()};
+		oss << v ? v->toString() : "null";
 	} // end for //
 	oss << ']';
 	return move(oss.str());
 }
 
-unique_ptr<JsonXArray>&& JsonXArray::read(istream& iss) {
+JsonXArray* JsonXArray::read(istream& iss) {
     int next_ch;
     next_ch = skipWhitespace(iss);
     if (next_ch == -1)
@@ -49,12 +69,12 @@ unique_ptr<JsonXArray>&& JsonXArray::read(istream& iss) {
         throw JsonXException(
             "Character '[' expected. Got: '" +
 			to_string(static_cast<char>(next_ch)) + "'");
-    auto list = unique_ptr<JsonXArray>{new JsonXArray()};
+    auto pArray = new JsonXArray();
     readChar(iss);
     next_ch = skipWhitespace(iss);
     if (next_ch != ']') {
         while (true) {
-            list->m_value.push_back(move(JsonXValue::read(iss)));
+            pArray->add(JsonXValue::read(iss));
             next_ch = skipWhitespace(iss);
             if (next_ch == ']')
                 break;
@@ -66,7 +86,7 @@ unique_ptr<JsonXArray>&& JsonXArray::read(istream& iss) {
         } // end while //
     }
     readChar(iss);
-    return move(list);
+    return pArray;
 }
 
 } /* namespace JsonX */

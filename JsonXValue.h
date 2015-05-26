@@ -20,7 +20,6 @@
 #define JSONXVALUE_H_
 
 #include <string>
-#include <memory>
 #include <iostream>
 
 namespace JsonX {
@@ -58,9 +57,9 @@ public:
 	/**
 	 * Read a value from input stream.
 	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXBool
+	 * @return Poniter to JsonXValue allocated on heap
 	 */
-	static std::unique_ptr<JsonXValue>&& read(std::istream& iss);
+	static JsonXValue* read(std::istream& iss);
 
 	/**
 	 * Get type of this value, so RTTI is not required.
@@ -71,7 +70,7 @@ public:
 	/**
 	 * Destructor
 	 */
-	virtual ~JsonXValue();
+	virtual ~JsonXValue() {};
 
 	/**
 	 * Skip whitespace from istream.

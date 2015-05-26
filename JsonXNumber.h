@@ -19,22 +19,31 @@
 #ifndef JSONXNUMBER_H_
 #define JSONXNUMBER_H_
 
-#include "JsonXAtom.h"
+#include "JsonXValue.h"
 
 namespace JsonX {
 
-class JsonXNumber: public JsonXAtom {
+class JsonXNumber: public JsonXValue {
 public:
 	/**
 	 * Destructor
 	 */
-	virtual ~JsonXNumber() {};
+	virtual ~JsonXNumber();
 
 	/**
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
 	virtual std::string&& toString() const = 0;
+
+	/**
+	 * Read a number object from input stream. It must be known that
+	 * there really is a number, so the first character have to be
+	 * a '-' or '0'..'9'.
+	 * @param iss The input stream to read from
+	 * @return New JsonXNumber allocated on the heap.
+	 */
+	static JsonXNumber* read(std::istream& iss);
 
 	/**
 	 * Get type of this value, so RTTI is not required.
@@ -83,15 +92,6 @@ public:
 	 * @return value
 	 */
 	double doubleValue() const;
-
-	/**
-	 * Read a number object from input stream. It must be known that
-	 * there really is a number, so the first character have to be
-	 * a '-' or '0'..'9'.
-	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXBool
-	 */
-	static std::unique_ptr<JsonXNumber>&& read(std::istream& iss);
 
 private:
 	uint64_t posIntValue(uint64_t max) const;

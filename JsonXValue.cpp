@@ -32,15 +32,15 @@ using namespace std;
 
 namespace JsonX {
 
-unique_ptr<JsonXValue>&& JsonXValue::read(istream& iss) {
+JsonXValue* JsonXValue::read(istream& iss) {
     int next_ch = skipWhitespace(iss);
     switch (next_ch) {
         case -1 :
-            return move(unique_ptr<JsonXNull>{new JsonXNull()});
+            return new JsonXNull();
         case '{' :
-            return move(JsonXObject::read(iss));
+            return JsonXObject::read(iss);
         case '[' :
-            return move(JsonXArray::read(iss));
+            return JsonXArray::read(iss);
         case '-' :
         case '0' :
         case '1' :
@@ -52,16 +52,16 @@ unique_ptr<JsonXValue>&& JsonXValue::read(istream& iss) {
         case '7' :
         case '8' :
         case '9' :
-            return move(JsonXNumber::read(iss));
+            return JsonXNumber::read(iss);
         case '"' :
-            return move(JsonXString::read(iss));
+            return JsonXString::read(iss);
         case '=' :
-        	return move(JsonXBlob::read(iss));
+        	return JsonXBlob::read(iss);
         case 't' :
         case 'f' :
-            return move(JsonXBool::read(iss));
+            return JsonXBool::read(iss);
         case 'n' :
-            return move(JsonXNull::read(iss));
+            return JsonXNull::read(iss);
         default :
             throw JsonXException(
                 "JsonX::read(): Unexpected input: '" +
@@ -74,7 +74,7 @@ int JsonXValue::skipWhitespace(istream& iss) {
 	while (true) {
 		_ch = iss.peek();
 		if ((_ch != -1) && isspace(_ch))
-			++iss;
+			readChar(iss);
 		else
 			return _ch;
 	} // end while //

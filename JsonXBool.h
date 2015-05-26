@@ -19,11 +19,11 @@
 #ifndef JSONXBOOL_H_
 #define JSONXBOOL_H_
 
-#include "JsonXAtom.h"
+#include "JsonXValue.h"
 
 namespace JsonX {
 
-class JsonXBool: public JsonXAtom {
+class JsonXBool: public JsonXValue {
 public:
 	/**
 	 * Constructor.
@@ -32,15 +32,31 @@ public:
 	JsonXBool(bool value);
 
 	/**
+	 * Comfort function for constructing in code
+	 * @param value The bool value
+	 * @return New JsonXBool allocated on the heap
+	 */
+	JsonXBool* make(bool value) { return new JsonXBool(value); }
+
+	/**
 	 * Destructor
 	 */
-	virtual ~JsonXBool() {};
+	virtual ~JsonXBool();
 
 	/**
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
 	virtual std::string&& toString() const;
+
+	/**
+	 * Read a bool object from input stream. It must be known that
+	 * there really is a bool, so the first character have to be
+	 * a 't' or a 'f'.
+	 * @param iss The input stream to read from
+	 * @return Pointer to new JsonXBool allocated on the heap
+	 */
+	static JsonXBool* read(std::istream& iss);
 
 	/**
 	 * Get type of this value, so RTTI is not required.
@@ -54,17 +70,8 @@ public:
 	 */
 	bool value() const { return m_value; }
 
-	/**
-	 * Read a bool object from input stream. It must be known that
-	 * there really is a bool, so the first character have to be
-	 * a 't' or a 'f'.
-	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXBool
-	 */
-	static std::unique_ptr<JsonXBool>&& read(std::istream& iss);
-
 private:
-	bool m_value;
+	const bool m_value;
 };
 
 } /* namespace JsonX */

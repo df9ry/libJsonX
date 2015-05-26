@@ -25,11 +25,24 @@ using namespace B64;
 
 namespace JsonX {
 
-JsonXBlob::JsonXBlob(const vector<uint8_t>& value):
-	m_value{unique_ptr<vector<uint8_t>>{new vector<uint8_t>(value)}} {}
+JsonXBlob::JsonXBlob(): m_value
+	{unique_ptr<JsonXBlobData>(new JsonXBlobData())} {}
 
-JsonXBlob::JsonXBlob(unique_ptr<vector<uint8_t>>&& value):
-	m_value{unique_ptr<vector<uint8_t>>{move(value)}} {}
+JsonXBlob::JsonXBlob(const JsonXBlobData& value): m_value
+	{unique_ptr<JsonXBlobData>(new JsonXBlobData(value))} {}
+
+JsonXBlob::JsonXBlob(JsonXBlobData&& value): m_value
+	{unique_ptr<JsonXBlobData>(move(&value))} {}
+
+JsonXBlob::JsonXBlob(initializer_list<uint8_t> il):
+		m_value{new JsonXBlobData(il.size())}
+	//{ for (auto i: il) m_value.get()->push_back(i); }
+{
+	uninitialized_copy(il.begin(), il.begin() + il.size(),
+			m_value.get()->begin());
+}
+
+JsonXBlob::~JsonXBlob() {}
 
 string&& JsonXBlob::toString() const {
 	ostringstream oss{};
@@ -39,20 +52,20 @@ string&& JsonXBlob::toString() const {
 	return move(oss.str());
 }
 
-unique_ptr<JsonXBlob>&& JsonXBlob::read(istream& iss) {
+JsonXBlob* JsonXBlob::read(istream& iss) {
     int next_ch = skipWhitespace(iss);
     if (next_ch != '=')
         throw JsonXException(
             "Invalid input: Expected '=', got: '" +
 			to_string(static_cast<char>(next_ch)) + "'");
     readChar(iss);
-    vector<uint8_t> data{};
+    auto pValue = new JsonXBlob();
 	decode( [&iss](){ char ch; return iss.readsome(&ch, 1) ? ch : -1; },
-			[&data](uint8_t x){ data.push_back(x); });
+			[&pValue](uint8_t x){ pValue->add(x); });
 	// Read away trailing '=':
 	while (iss.peek() == '=')
 		readChar(iss);
-    return move(unique_ptr<JsonXBlob>(new JsonXBlob(move(data))));
+    return pValue;
 }
 
 } /* namespace JsonX */

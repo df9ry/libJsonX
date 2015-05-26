@@ -80,10 +80,7 @@ static uint8_t hex_digit(char ch) {
 }
 
 JsonXString::JsonXString(const string& value):
-	m_value{unique_ptr<string>{new string(value)}} {}
-
-JsonXString::JsonXString(unique_ptr<string>&& value):
-	m_value{unique_ptr<string>{move(value)}} {}
+	m_value{value} {}
 
 string&& JsonXString::toString() const {
 	return move(toJson(value()));
@@ -138,6 +135,10 @@ string&& JsonXString::toJson(const string& s) {
     } // end for //
     oss << '"';
 	return move(oss.str());
+}
+
+JsonXString* JsonXString::read(istream& iss) {
+    return new JsonXString(readRaw(iss));
 }
 
 string&& JsonXString::readRaw(istream& iss) {

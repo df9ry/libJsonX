@@ -19,9 +19,8 @@
 #include "JsonXNumber.h"
 #include "JsonXException.h"
 
-#include "JsonXScalar.h"
-
 #include <sstream>
+#include "JsonXScalar"
 
 using namespace std;
 
@@ -68,7 +67,9 @@ static uint8_t digit(char ch) {
     } // end switch(ch) //
 }
 
-unique_ptr<JsonXNumber>&& JsonXNumber::read(istream& iss) {
+JsonXNumber::~JsonXNumber() {}
+
+JsonXNumber* JsonXNumber::read(istream& iss) {
 	ostringstream oss{};
     NumberState state = NumberState::START;
     skipWhitespace(iss);
@@ -303,45 +304,38 @@ unique_ptr<JsonXNumber>&& JsonXNumber::read(istream& iss) {
     		if (isPositive) {
     			unsigned long long _v = stoll(t);
     			if (_v <= UINT16_MAX) {
-    		        auto pv = new JsonXScalar<uint16_t, ValueType::T_UINT16>
+    		        return new JsonXScalar<uint16_t, ValueType::T_UINT16>
     		        	(static_cast<uint16_t>(_v));
-    		        return move(unique_ptr<JsonXNumber>(pv));
     			}
     			if (_v <= UINT32_MAX) {
-    		        auto pv = new JsonXScalar<uint32_t, ValueType::T_UINT32>
+    		        return new JsonXScalar<uint32_t, ValueType::T_UINT32>
     		        	(static_cast<uint32_t>(_v));
-    		        return move(unique_ptr<JsonXNumber>(pv));
     			}
     			if (_v <= UINT64_MAX) {
-    		        auto pv = new JsonXScalar<uint64_t, ValueType::T_UINT64>
+    		        return new JsonXScalar<uint64_t, ValueType::T_UINT64>
     		        	(static_cast<uint64_t>(_v));
-    		        return move(unique_ptr<JsonXNumber>(pv));
     			}
     		} else {
     			// is negative:
     			signed long long _v = strtoll(t.c_str(), 0, 0);
     			if (_v >= INT16_MIN) {
-    		        auto pv = new JsonXScalar<int16_t, ValueType::T_INT16>
+    		        return new JsonXScalar<int16_t, ValueType::T_INT16>
     		        	(static_cast<int16_t>(_v));
-    		        return move(unique_ptr<JsonXNumber>(pv));
     			}
     			if (_v >= INT32_MIN) {
-    		        auto pv = new JsonXScalar<int32_t, ValueType::T_INT32>
+    		        return new JsonXScalar<int32_t, ValueType::T_INT32>
     		        	(static_cast<int32_t>(_v));
-    		        return move(unique_ptr<JsonXNumber>(pv));
     			}
     			if (_v >= INT64_MIN) {
-    		        auto pv = new JsonXScalar<int64_t, ValueType::T_INT64>
+    		        return new JsonXScalar<int64_t, ValueType::T_INT64>
     		        	(static_cast<int64_t>(_v));
-    		        return move(unique_ptr<JsonXNumber>(pv));
     			}
     		}
     	}
     	// Here we must handle with double:
     	double _v = stod(t);
-        auto pv = new JsonXScalar<double, ValueType::T_DOUBLE>
+        return new JsonXScalar<double, ValueType::T_DOUBLE>
         	(static_cast<double>(_v));
-        return move(unique_ptr<JsonXNumber>(pv));
     }
     catch (const exception& ex) {
         throw JsonXException("Invalid number format: ", ex);

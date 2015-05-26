@@ -19,7 +19,7 @@
 #ifndef JSONXNULL_H_
 #define JSONXNULL_H_
 
-#include "JsonXAtom.h"
+#include "JsonXValue.h"
 
 namespace JsonX {
 
@@ -31,9 +31,15 @@ public:
 	JsonXNull();
 
 	/**
+	 * Comfort function to make inline coding easier.
+	 * @return New JsonXNull on the heap
+	 */
+	JsonXNull* make() { return new JsonXNull(); }
+
+	/**
 	 * Destructor
 	 */
-	virtual ~JsonXNull() {};
+	virtual ~JsonXNull();
 
 	/**
 	 * Get string form of Json object.
@@ -42,19 +48,20 @@ public:
 	virtual std::string&& toString() const;
 
 	/**
+	 * Read a null object from input stream. It must be known that
+	 * there really is a null, so the first character have to be
+	 * a 'n'.
+	 * @param iss The input stream to read from
+	 * @return New JsonXNull object on the heap
+	 */
+	static JsonXNull* read(std::istream& iss);
+
+	/**
 	 * Get type of this value, so RTTI is not required.
 	 * @return Type of this value
 	 */
 	virtual ValueType type() const { return ValueType::T_NULL; }
 
-	/**
-	 * Read a null object from input stream. It must be known that
-	 * there really is a null, so the first character have to be
-	 * a 'n'.
-	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXNull
-	 */
-	static std::unique_ptr<JsonXNull>&& read(std::istream& iss);
 };
 
 } /* namespace JsonX */

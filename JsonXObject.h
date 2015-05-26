@@ -19,19 +19,37 @@
 #ifndef JSONXOBJECT_H_
 #define JSONXOBJECT_H_
 
-#include "JsonXString.h"
+#include "JsonXValue.h"
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace JsonX {
+
+class JsonXObject;
 
 /**
  * This is an entry in a json object.
  */
+struct JsonXObjectEntry {
+	const std::string           key;
+	std::unique_ptr<JsonXValue> val;
+};
 
-using JsonXEntry = typename
-	std::pair<const std::string, std::unique_ptr<JsonXValue>>;
+/**
+ * This is an entry in an initializer list.
+ */
+struct JsonXObjectInitEntry {
+	const std::string           key;
+	JsonXObject*                val;
+};
+
+/**
+ * Shortcut for value type;
+ */
+using JsonXObjectValue = typename
+		std::vector<std::unique_ptr<JsonXObjectEntry>>;
 
 /**
  * This is a json object.
@@ -41,45 +59,40 @@ public:
 	/**
 	 * Construct new empty object.
 	 */
-	JsonXObject(): m_value{} {}
+	JsonXObject();
 
 	/**
-	 * Add value to the object with move
-	 * @param v Value to add
-	 * @return Reference to itself to allow chaining.
+	 * Helper function to make inline values more easy.
+	 * @return New JsonXObject on the heap
 	 */
-	JsonXObject& add(JsonXEntry&& v) {
-		m_value.push_back(move(v));
-		return *this;
+	JsonXObject* make() { return new JsonXObject(); }
+
+	/**
+	 * Initializer list constructor.
+	 * @param il The initializer list
+	 */
+	JsonXObject(std::initializer_list<JsonXObjectInitEntry> il);
+
+	/**
+	 * Helper function to make inline values more easy.
+	 * @param il The initializer list
+	 * @return New JsonXObject on the heap
+	 */
+	JsonXObject* make(std::initializer_list<JsonXObjectInitEntry> il) {
+		return new JsonXObject(il);
 	}
 
 	/**
-	 * Add new value to the list. Takes ownership
-	 * @param k Key to add
-	 * @param v Value to add
-	 * @return Reference to itself to allow chaining.
+	 * Destructor
 	 */
-	JsonXObject& add(
-			const std::string& k,
-			std::unique_ptr<JsonXValue>&& v)
-	{
-		auto pair = make_pair(k, move(v));
-		m_value.push_back(move(pair));
-		return *this;
-	}
+	virtual ~JsonXObject();
 
 	/**
-	 * Add new value to the list. Takes ownership
-	 * @param k Key to add
+	 * Add value to the object with taking ownership
 	 * @param v Value to add
-	 * @return Reference to itself to allow chaining.
+	 * @return Pointer to itself to allow chaining.
 	 */
-	JsonXObject& add(const std::string& k, JsonXValue* v) {
-		JsonXEntry p{JsonXEntry(move(std::string{k}),
-				std::unique_ptr<JsonXValue>(v))};
-		m_value.push_back(move(p));
-		return *this;
-	}
+	JsonXObject* add(const std::string& key, JsonXValue* o);
 
 	/**
 	 * Get string form of Json object.
@@ -88,27 +101,57 @@ public:
 	virtual std::string&& toString() const;
 
 	/**
+	 * Read an object from input stream. It must be known that
+	 * there really is an object, so the first character have to be
+	 * a '{'.
+	 * @param iss The input stream to read from
+	 * @return pointer to new JsonXObject allocated on
+	 *         heap
+	 */
+	static JsonXObject* read(std::istream& iss);
+
+	/**
 	 * Get type of this value, so RTTI is not required.
 	 * @return Type of this value
 	 */
 	virtual ValueType type() const { return ValueType::T_OBJECT; }
 
 	/**
-	 * Destructor
+	 * Get value.
+	 * @return value
 	 */
-	~JsonXObject();
+	const JsonXObjectValue& value() const { return *m_value.get(); }
 
 	/**
-	 * Read an object from input stream. It must be known that
-	 * there really is an object, so the first character have to be
-	 * a '{'.
-	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXBool
+	 * Get value.
+	 * @return value
 	 */
-	static std::unique_ptr<JsonXObject>&& read(std::istream& iss);
+	JsonXObjectValue&& value() { return move(*m_value.get()); }
+
+	/**
+	 * Test for a key
+	 * @param key The key
+	 * @return True, if object contains key
+	 */
+	bool contains(const std::string& key);
+
+	/**
+	 * Find a value by key.
+	 * @param key The key
+	 * @return Const value or const JsonXNull, if not found
+	 */
+	const JsonXValue& find(const std::string& key) const;
+
+	JsonXValue&& find(const std::string& key);
+	/**
+	 * Find a value by key and move out. Throws exception if
+	 * not found.
+	 * @param key The key
+	 * @return Moved value
+	 */
 
 private:
-	std::vector<JsonXEntry> m_value;
+	std::unique_ptr<JsonXObjectValue> m_value;
 };
 
 } /* namespace JsonX */

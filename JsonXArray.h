@@ -21,10 +21,15 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "JsonXValue.h"
+#include "JsonXObject.h"
 
 namespace JsonX {
+
+using JsonXArrayData = typename
+	std::vector<std::unique_ptr<JsonXValue>>;
 
 /**
  * A JsonXArray holds a list of JsonXValue items.
@@ -35,36 +40,32 @@ public:
 	/**
 	 * Construct new empty array.
 	 */
-	JsonXArray(): m_value{} {}
+	JsonXArray();
+
+	/**
+	 * Comfort function to create a JsonXArray.
+	 * @return Pointer to new object on the heap
+	 */
+	static inline JsonXArray* make()
+	{ return new JsonXArray(); }
 
 	/**
 	 * Construct new array with an initializer list.
 	 * @param il Initializer list
 	 */
-	JsonXArray(std::initializer_list<JsonXValue*> il): m_value{} {
-		for (auto p: il)
-			m_value.push_back(move(std::unique_ptr<JsonXValue>(p)));
-	}
+	JsonXArray(std::initializer_list<JsonXValue*> il);
 
 	/**
-	 * Add value to the list with move
-	 * @param v Value to add
-	 * @return Reference to itself to allow chaining.
+	 * Destructor
 	 */
-	JsonXArray& add(std::unique_ptr<JsonXValue>&& v) {
-		m_value.push_back(move(v));
-		return *this;
-	}
+	virtual ~JsonXArray();
 
 	/**
 	 * Add new value to the list. Takes ownership
 	 * @param v Value to add
-	 * @return Reference to itself to allow chaining.
+	 * @return Pointer to itself to allow chaining.
 	 */
-	JsonXArray& add(JsonXValue* v) {
-		m_value.push_back(move(std::unique_ptr<JsonXValue>{v}));
-		return *this;
-	}
+	JsonXArray* add(JsonXValue* v);
 
 	/**
 	 * Get string form of Json object.
@@ -79,21 +80,28 @@ public:
 	virtual ValueType type() const { return ValueType::T_ARRAY; }
 
 	/**
-	 * Destructor
-	 */
-	virtual ~JsonXArray();
-
-	/**
 	 * Read a list from input stream. It must be known that
 	 * there really is a list, so the first character have to be
 	 * a '['.
 	 * @param iss The input stream to read from
-	 * @return unique_ptr to JsonXBool
+	 * @return Pointer to object on the heap
 	 */
-	static std::unique_ptr<JsonXArray>&& read(std::istream& iss);
+	static JsonXArray* read(std::istream& iss);
+
+	/**
+	 * Get value.
+	 * @return value
+	 */
+	const JsonXArrayData& value() const { return *m_value.get(); }
+
+	/**
+	 * Get value.
+	 * @return value
+	 */
+	JsonXArrayData&& value() { return move(*m_value.get()); }
 
 private:
-	std::vector<std::unique_ptr<JsonXValue>> m_value;
+	std::unique_ptr<JsonXArrayData> m_value;
 };
 
 } /* namespace JsonX */

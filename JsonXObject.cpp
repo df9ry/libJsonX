@@ -18,31 +18,59 @@
 
 #include "JsonXObject.h"
 #include "JsonXException.h"
+#include "JsonXString.h"
+#include "JsonXNull.h"
 
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 
 using namespace std;
 
 namespace JsonX {
+
+JsonXObject::JsonXObject(): m_value
+	{unique_ptr<JsonXObjectValue>(new JsonXObjectValue())} {}
+
+JsonXObject::JsonXObject(initializer_list<JsonXObjectInitEntry> il): m_value
+	{unique_ptr<JsonXObjectValue>(new JsonXObjectValue())}
+{
+	for (initializer_list<JsonXObjectInitEntry>::const_iterator i = il.begin();
+			i != il.end(); ++ i)
+		add(i->key, i->val);
+}
+
+JsonXObject::~JsonXObject() {}
+
+JsonXObject* JsonXObject::add(const string& key, JsonXValue* val) {
+	m_value.get()->push_back(unique_ptr<JsonXObjectEntry>(
+			new JsonXObjectEntry{key, unique_ptr<JsonXValue>(val)}));
+	return this;
+}
 
 string&& JsonXObject::toString() const {
 	ostringstream oss{};
 	oss << '{';
 	bool first{true};
 	oss << '[';
-	for (vector<JsonXEntry>::const_iterator i = m_value.begin();
-			i != m_value.end(); ++i) {
+	for (JsonXObjectValue::const_iterator i = m_value.get()->begin();
+			i != m_value.get()->end(); ++i) {
 		if (first) first = false; else oss << ',';
-		oss << JsonXString::toJson(i->first);
-		oss << ':';
-		oss << i->second.get()->toString();
+		const JsonXObjectEntry* e{i->get()};
+		if (e) {
+			oss << JsonXString::toJson(e->key);
+			oss << ':';
+			JsonXValue* v{e->val.get()};
+			oss << (v) ? v->toString() : "null";
+		} else {
+			oss << "null";
+		}
 	} // end for //
 	oss << '}';
 	return move(oss.str());
 }
 
-unique_ptr<JsonXObject>&& JsonXObject::read(istream& iss) {
+JsonXObject* JsonXObject::read(istream& iss) {
     int next_ch;
     next_ch = (char)skipWhitespace(iss);
     if (next_ch == -1)
@@ -52,7 +80,7 @@ unique_ptr<JsonXObject>&& JsonXObject::read(istream& iss) {
         throw JsonXException(
             "Character '{' expected. Got: '" +
 			to_string(static_cast<char>(next_ch)) + "'");
-    auto items = unique_ptr<JsonXObject>(new JsonXObject());
+    JsonXObject* items = new JsonXObject();
     readChar(iss);;
     next_ch = skipWhitespace(iss);
     if (next_ch != '}') {
@@ -64,8 +92,8 @@ unique_ptr<JsonXObject>&& JsonXObject::read(istream& iss) {
                     "Expected ':'. Got: '" +
 					to_string(static_cast<char>(next_ch)) + "'");
             readChar(iss);;
-            unique_ptr<JsonXValue>&& val = JsonXValue::read(iss);
-            items.get()->add(key, move(val));
+            JsonXValue* val = JsonXValue::read(iss);
+            items->add(key, move(val));
             next_ch = skipWhitespace(iss);
             if (next_ch == '}')
                 break;
@@ -77,7 +105,35 @@ unique_ptr<JsonXObject>&& JsonXObject::read(istream& iss) {
         } // end while //
     }
     readChar(iss);
-    return move(items);
+    return items;
+}
+
+bool JsonXObject::contains(const string& key) {
+	const JsonXObjectValue& l = *m_value.get();
+	for (JsonXObjectValue::const_iterator i = l.begin();
+			i != l.end(); ++i)
+		if (i->get() && (i->get()->key == key)) return true;
+	return false;
+}
+
+static JsonXNull jxnull{};
+
+const JsonXValue& JsonXObject::find(const string& key) const {
+	const JsonXObjectValue& l = *m_value.get();
+	for (JsonXObjectValue::const_iterator i = l.begin();
+			i != l.end(); ++i)
+		if (i->get() && (i->get()->key == key))
+			return *(i->get()->val.get());
+	return jxnull;
+}
+
+JsonXValue&& JsonXObject::find(const string& key) {
+	const JsonXObjectValue& l = *m_value.get();
+	for (JsonXObjectValue::const_iterator i = l.begin();
+			i != l.end(); ++i)
+		if (i->get() &&(i->get()->key == key))
+			return move(*(i->get()->val.get()));
+	throw invalid_argument("Not found: " + key);
 }
 
 } /* namespace JsonX */
