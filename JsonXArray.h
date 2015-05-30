@@ -56,6 +56,14 @@ public:
 	JsonXArray(std::initializer_list<JsonXBase*> il);
 
 	/**
+	 * Move another data vector into this array.
+	 * @param value Data vector to move in.
+	 */
+	inline void set(std::unique_ptr<JsonXArrayData>&& value) {
+		std::swap(m_value, value);
+	}
+
+	/**
 	 * Destructor
 	 */
 	virtual ~JsonXArray();
@@ -71,7 +79,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const;
+	virtual std::string toString() const;
 
 	/**
 	 * Get type of this value, so RTTI is not required.
@@ -95,10 +103,10 @@ public:
 	const JsonXArrayData& value() const { return *m_value.get(); }
 
 	/**
-	 * Get value.
+	 * Extract value.
 	 * @return value
 	 */
-	JsonXArrayData&& value() { return move(*m_value.get()); }
+	std::unique_ptr<JsonXArrayData> extract();
 
 private:
 	std::unique_ptr<JsonXArrayData> m_value;

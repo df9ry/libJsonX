@@ -82,6 +82,14 @@ public:
 	}
 
 	/**
+	 * Move another data vector into this object.
+	 * @param value Data vector to move in.
+	 */
+	inline void set(std::unique_ptr<JsonXObjectValue>&& value) {
+		std::swap(m_value, value);
+	}
+
+	/**
 	 * Destructor
 	 */
 	virtual ~JsonXObject();
@@ -97,7 +105,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const;
+	virtual std::string toString() const;
 
 	/**
 	 * Read an object from input stream. It must be known that
@@ -148,6 +156,12 @@ public:
 	 * @param key The key
 	 * @return Moved value
 	 */
+
+	/**
+	 * Extract value.
+	 * @return value
+	 */
+	std::unique_ptr<JsonXObjectValue> extract();
 
 private:
 	std::unique_ptr<JsonXObjectValue> m_value;

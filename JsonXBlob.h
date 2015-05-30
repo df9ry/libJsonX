@@ -79,6 +79,14 @@ public:
 	}
 
 	/**
+	 * Move another data vector into this blob.
+	 * @param value Data vector to move in.
+	 */
+	inline void set(std::unique_ptr<JsonXBlobData>&& value) {
+		std::swap(m_value, value);
+	}
+
+	/**
 	 * Destructor
 	 */
 	virtual ~JsonXBlob();
@@ -87,7 +95,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const;
+	virtual std::string toString() const;
 
 	/**
 	 * Read a blob object from input stream. It must be known that
@@ -111,13 +119,13 @@ public:
 	const JsonXBlobData& value() const { return *m_value.get(); }
 
 	/**
-	 * Get value.
+	 * Extract value.
 	 * @return value
 	 */
-	JsonXBlobData&& value() { return move(*m_value.get()); }
+	std::unique_ptr<JsonXBlobData> extract();
 
 private:
-	std::unique_ptr<JsonXBlobData>&& m_value;
+	std::unique_ptr<JsonXBlobData> m_value;
 };
 
 } /* namespace JsonX */

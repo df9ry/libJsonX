@@ -27,7 +27,7 @@ JsonXBool::JsonXBool(bool value): m_value{value} {}
 
 JsonXBool::~JsonXBool() {}
 
-string&& JsonXBool::toString() const {
+string JsonXBool::toString() const {
 	string&& s{m_value ? "true" : "false"};
 	return move(s);
 }

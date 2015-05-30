@@ -31,6 +31,7 @@ LDXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC -rdynamic \
 			-L../../libB64/_$(_ARCH)-$(_CONF)
 
 OBJS     =  JsonXArray.o \
+			JsonXBase.o \
 			JsonXBlob.o \
 			JsonXBool.o \
 			JsonXNull.o \

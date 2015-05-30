@@ -48,7 +48,7 @@ JsonXObject* JsonXObject::add(const string& key, JsonXBase* val) {
 	return this;
 }
 
-string&& JsonXObject::toString() const {
+string JsonXObject::toString() const {
 	ostringstream oss{};
 	oss << '{';
 	bool first{true};
@@ -67,7 +67,7 @@ string&& JsonXObject::toString() const {
 		}
 	} // end for //
 	oss << '}';
-	return move(oss.str());
+	return oss.str();
 }
 
 JsonXObject* JsonXObject::read(istream& iss) {
@@ -134,6 +134,12 @@ JsonXBase&& JsonXObject::find(const string& key) {
 		if (i->get() &&(i->get()->key == key))
 			return move(*(i->get()->val.get()));
 	throw invalid_argument("Not found: " + key);
+}
+
+unique_ptr<JsonXObjectValue> JsonXObject::extract() {
+	unique_ptr<JsonXObjectValue> d{unique_ptr<JsonXObjectValue>()};
+	swap(m_value, d);
+	return d;
 }
 
 } /* namespace JsonX */

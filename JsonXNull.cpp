@@ -27,9 +27,8 @@ JsonXNull::JsonXNull() {}
 
 JsonXNull::~JsonXNull() {}
 
-string&& JsonXNull::toString() const {
-	string&& s{"null"};
-	return move(s);
+string JsonXNull::toString() const {
+	return "null";
 }
 
 JsonXNull* JsonXNull::read(istream& iss) {

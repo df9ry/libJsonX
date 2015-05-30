@@ -19,29 +19,12 @@
 #ifndef JSONXBASE_H_
 #define JSONXBASE_H_
 
+#include "ValueType.h"
+
 #include <string>
 #include <iostream>
 
 namespace JsonX {
-
-/**
- * Class marker, to avoid RTTI.
- */
-enum class ValueType {
-	T_STRING,    //!< T_STRING  This is a json string
-	T_BLOB,      //!< T_BLOB    This is a json blob (Extension)
-	T_NULL,      //!< T_NULL    This is a null value
-	T_BOOL,      //!< T_BOOL    This is a json boolean
-	T_INT16,     //!< T_INT16   This is a json 16 bit signed integer
-	T_UINT16,    //!< T_UINT16  This is a json 16 bit unsigned integer
-	T_INT32,     //!< T_INT32   This is a json 32 bit signed integer
-	T_UINT32,    //!< T_UINT32  This is a json 32 bit unsigned integer
-	T_INT64,     //!< T_INT64   This is a json 64 bit signed integer
-	T_UINT64,    //!< T_UINT64  This is a json 64 bit unsigned integer
-	T_DOUBLE,    //!< T_DOUBLE  This is a json double real
-	T_OBJECT,    //!< T_OBJECT  This is a json object
-	T_ARRAY,     //!< T_ARRAY   This is a json array
-};
 
 /**
  * Base class of all JsonX values.
@@ -52,7 +35,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const = 0;
+	virtual std::string toString() const = 0;
 
 	/**
 	 * Read a value from input stream.

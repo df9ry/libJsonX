@@ -34,7 +34,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const = 0;
+	virtual std::string toString() const = 0;
 
 	/**
 	 * Read a number object from input stream. It must be known that

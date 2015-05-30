@@ -82,11 +82,11 @@ static uint8_t hex_digit(char ch) {
 JsonXString::JsonXString(const string& value):
 	m_value{value} {}
 
-string&& JsonXString::toString() const {
-	return move(toJson(value()));
+string JsonXString::toString() const {
+	return toJson(value());
 }
 
-string&& JsonXString::toJson(const string& s) {
+string JsonXString::toJson(const string& s) {
 	ostringstream oss{};
     oss << '"';
     for (string::const_iterator i = s.begin();
@@ -134,14 +134,14 @@ string&& JsonXString::toJson(const string& s) {
         } // end switch //
     } // end for //
     oss << '"';
-	return move(oss.str());
+	return oss.str();
 }
 
 JsonXString* JsonXString::read(istream& iss) {
     return new JsonXString(readRaw(iss));
 }
 
-string&& JsonXString::readRaw(istream& iss) {
+string JsonXString::readRaw(istream& iss) {
     ostringstream oss{};
     StringState state = StringState::NORMAL;
     uint u = 0;
@@ -255,7 +255,7 @@ string&& JsonXString::readRaw(istream& iss) {
     if (state != StringState::STRING_CLOSED)
         throw JsonXException("String not closed in state " +
 				to_string(static_cast<int>(state)));
-    return move(oss.str());
+    return oss.str();
 }
 
 } /* namespace JsonX */

@@ -44,12 +44,12 @@ JsonXBlob::JsonXBlob(initializer_list<uint8_t> il):
 
 JsonXBlob::~JsonXBlob() {}
 
-string&& JsonXBlob::toString() const {
+string JsonXBlob::toString() const {
 	ostringstream oss{};
 	auto i = m_value.get()->begin();
 	encode( [&i, this](){ return (i != m_value.get()->end()) ? *++i : -1; },
 			[&oss](char ch){ oss << ch; });
-	return move(oss.str());
+	return oss.str();
 }
 
 JsonXBlob* JsonXBlob::read(istream& iss) {
@@ -66,6 +66,12 @@ JsonXBlob* JsonXBlob::read(istream& iss) {
 	while (iss.peek() == '=')
 		readChar(iss);
     return pValue;
+}
+
+unique_ptr<JsonXBlobData> JsonXBlob::extract() {
+	unique_ptr<JsonXBlobData> d{unique_ptr<JsonXBlobData>()};
+	swap(d, m_value);
+	return d;
 }
 
 } /* namespace JsonX */

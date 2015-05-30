@@ -49,7 +49,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const;
+	virtual std::string toString() const;
 
 	/**
 	 * Read a string object from input stream. It must be known that
@@ -67,14 +67,14 @@ public:
 	 * @param iss The input stream to read from
 	 * @return string
 	 */
-	static std::string&& readRaw(std::istream& iss);
+	static std::string readRaw(std::istream& iss);
 
 	/**
 	 * Convert string to its json form.
 	 * @param s String to convert
 	 * @return Converted string
 	 */
-	static std::string&& toJson(const std::string& s);
+	static std::string toJson(const std::string& s);
 
 	/**
 	 * Get type of this value, so RTTI is not required.

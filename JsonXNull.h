@@ -45,7 +45,7 @@ public:
 	 * Get string form of Json object.
 	 * @return string form of Json object
 	 */
-	virtual std::string&& toString() const;
+	virtual std::string toString() const;
 
 	/**
 	 * Read a null object from input stream. It must be known that

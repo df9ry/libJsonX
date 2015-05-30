@@ -40,11 +40,11 @@ JsonXArray::JsonXArray(initializer_list<JsonXBase*> il):
 JsonXArray::~JsonXArray() {}
 
 JsonXArray* JsonXArray::add(JsonXBase* v) {
-	value().push_back(unique_ptr<JsonXBase>{move(v)});
+	m_value.get()->push_back(unique_ptr<JsonXBase>{move(v)});
 	return this;
 }
 
-string&& JsonXArray::toString() const {
+string JsonXArray::toString() const {
 	ostringstream oss{};
 	bool first{true};
 	oss << '[';
@@ -56,7 +56,7 @@ string&& JsonXArray::toString() const {
 		oss << v ? v->toString() : "null";
 	} // end for //
 	oss << ']';
-	return move(oss.str());
+	return oss.str();
 }
 
 JsonXArray* JsonXArray::read(istream& iss) {
@@ -87,6 +87,12 @@ JsonXArray* JsonXArray::read(istream& iss) {
     }
     readChar(iss);
     return pArray;
+}
+
+unique_ptr<JsonXArrayData> JsonXArray::extract() {
+	unique_ptr<JsonXArrayData> d{unique_ptr<JsonXArrayData>()};
+	swap(m_value, d);
+	return d;
 }
 
 } /* namespace JsonX */
