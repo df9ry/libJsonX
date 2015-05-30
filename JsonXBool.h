@@ -19,11 +19,11 @@
 #ifndef JSONXBOOL_H_
 #define JSONXBOOL_H_
 
-#include "JsonXValue.h"
+#include "JsonXBase.h"
 
 namespace JsonX {
 
-class JsonXBool: public JsonXValue {
+class JsonXBool: public JsonXBase {
 public:
 	/**
 	 * Constructor.

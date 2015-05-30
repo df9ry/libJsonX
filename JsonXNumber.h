@@ -19,11 +19,11 @@
 #ifndef JSONXNUMBER_H_
 #define JSONXNUMBER_H_
 
-#include "JsonXValue.h"
+#include "JsonXBase.h"
 
 namespace JsonX {
 
-class JsonXNumber: public JsonXValue {
+class JsonXNumber: public JsonXBase {
 public:
 	/**
 	 * Destructor

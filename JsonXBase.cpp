@@ -16,7 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "JsonXValue.h"
+#include "JsonXBase.h"
+
 #include "JsonXArray.h"
 #include "JsonXBlob.h"
 #include "JsonXBool.h"
@@ -32,7 +33,7 @@ using namespace std;
 
 namespace JsonX {
 
-JsonXValue* JsonXValue::read(istream& iss) {
+JsonXBase* JsonXBase::read(istream& iss) {
     int next_ch = skipWhitespace(iss);
     switch (next_ch) {
         case -1 :
@@ -69,7 +70,7 @@ JsonXValue* JsonXValue::read(istream& iss) {
     } // end switch //
 }
 
-int JsonXValue::skipWhitespace(istream& iss) {
+int JsonXBase::skipWhitespace(istream& iss) {
 	int _ch;
 	while (true) {
 		_ch = iss.peek();

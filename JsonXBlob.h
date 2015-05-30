@@ -19,16 +19,15 @@
 #ifndef JSONXBLOB_H_
 #define JSONXBLOB_H_
 
-#include "JsonXValue.h"
-
 #include <vector>
 #include <memory>
+#include "JsonXBase.h"
 
 namespace JsonX {
 
 using JsonXBlobData = typename std::vector<uint8_t>;
 
-class JsonXBlob: public JsonXValue {
+class JsonXBlob: public JsonXBase {
 public:
 
 	/**

@@ -19,11 +19,10 @@
 #ifndef JSONXOBJECT_H_
 #define JSONXOBJECT_H_
 
-#include "JsonXValue.h"
-
 #include <string>
 #include <vector>
 #include <memory>
+#include "JsonXBase.h"
 
 namespace JsonX {
 
@@ -34,7 +33,7 @@ class JsonXObject;
  */
 struct JsonXObjectEntry {
 	const std::string           key;
-	std::unique_ptr<JsonXValue> val;
+	std::unique_ptr<JsonXBase> val;
 };
 
 /**
@@ -54,7 +53,7 @@ using JsonXObjectValue = typename
 /**
  * This is a json object.
  */
-class JsonXObject: public JsonXValue {
+class JsonXObject: public JsonXBase {
 public:
 	/**
 	 * Construct new empty object.
@@ -92,7 +91,7 @@ public:
 	 * @param v Value to add
 	 * @return Pointer to itself to allow chaining.
 	 */
-	JsonXObject* add(const std::string& key, JsonXValue* o);
+	JsonXObject* add(const std::string& key, JsonXBase* o);
 
 	/**
 	 * Get string form of Json object.
@@ -140,9 +139,9 @@ public:
 	 * @param key The key
 	 * @return Const value or const JsonXNull, if not found
 	 */
-	const JsonXValue& find(const std::string& key) const;
+	const JsonXBase& find(const std::string& key) const;
 
-	JsonXValue&& find(const std::string& key);
+	JsonXBase&& find(const std::string& key);
 	/**
 	 * Find a value by key and move out. Throws exception if
 	 * not found.

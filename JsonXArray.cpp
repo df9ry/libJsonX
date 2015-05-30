@@ -30,7 +30,7 @@ namespace JsonX {
 JsonXArray::JsonXArray(): m_value{
 	unique_ptr<JsonXArrayData>(new JsonXArrayData())} {}
 
-JsonXArray::JsonXArray(initializer_list<JsonXValue*> il):
+JsonXArray::JsonXArray(initializer_list<JsonXBase*> il):
 	m_value{unique_ptr<JsonXArrayData>(new JsonXArrayData(il.size()))}
 {
 	uninitialized_copy(il.begin(), il.begin() + il.size(),
@@ -39,8 +39,8 @@ JsonXArray::JsonXArray(initializer_list<JsonXValue*> il):
 
 JsonXArray::~JsonXArray() {}
 
-JsonXArray* JsonXArray::add(JsonXValue* v) {
-	value().push_back(unique_ptr<JsonXValue>{move(v)});
+JsonXArray* JsonXArray::add(JsonXBase* v) {
+	value().push_back(unique_ptr<JsonXBase>{move(v)});
 	return this;
 }
 
@@ -52,7 +52,7 @@ string&& JsonXArray::toString() const {
 			i != value().end(); ++i)
 	{
 		if (first) first = false; else oss << ',';
-		JsonXValue* v{i->get()};
+		JsonXBase* v{i->get()};
 		oss << v ? v->toString() : "null";
 	} // end for //
 	oss << ']';
@@ -74,7 +74,7 @@ JsonXArray* JsonXArray::read(istream& iss) {
     next_ch = skipWhitespace(iss);
     if (next_ch != ']') {
         while (true) {
-            pArray->add(JsonXValue::read(iss));
+            pArray->add(JsonXBase::read(iss));
             next_ch = skipWhitespace(iss);
             if (next_ch == ']')
                 break;

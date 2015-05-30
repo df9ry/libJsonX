@@ -19,11 +19,11 @@
 #ifndef JSONXSTRING_H_
 #define JSONXSTRING_H_
 
-#include "JsonXValue.h"
+#include "JsonXBase.h"
 
 namespace JsonX {
 
-class JsonXString: public JsonXValue {
+class JsonXString: public JsonXBase {
 public:
 	/**
 	 * Constructor.

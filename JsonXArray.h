@@ -23,18 +23,18 @@
 #include <vector>
 #include <memory>
 
-#include "JsonXValue.h"
+#include "JsonXBase.h"
 #include "JsonXObject.h"
 
 namespace JsonX {
 
 using JsonXArrayData = typename
-	std::vector<std::unique_ptr<JsonXValue>>;
+	std::vector<std::unique_ptr<JsonXBase>>;
 
 /**
  * A JsonXArray holds a list of JsonXValue items.
  */
-class JsonXArray: public JsonXValue {
+class JsonXArray: public JsonXBase {
 public:
 
 	/**
@@ -53,7 +53,7 @@ public:
 	 * Construct new array with an initializer list.
 	 * @param il Initializer list
 	 */
-	JsonXArray(std::initializer_list<JsonXValue*> il);
+	JsonXArray(std::initializer_list<JsonXBase*> il);
 
 	/**
 	 * Destructor
@@ -65,7 +65,7 @@ public:
 	 * @param v Value to add
 	 * @return Pointer to itself to allow chaining.
 	 */
-	JsonXArray* add(JsonXValue* v);
+	JsonXArray* add(JsonXBase* v);
 
 	/**
 	 * Get string form of Json object.

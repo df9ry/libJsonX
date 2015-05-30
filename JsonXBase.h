@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JSONXVALUE_H_
-#define JSONXVALUE_H_
+#ifndef JSONXBASE_H_
+#define JSONXBASE_H_
 
 #include <string>
 #include <iostream>
@@ -46,7 +46,7 @@ enum class ValueType {
 /**
  * Base class of all JsonX values.
  */
-class JsonXValue {
+class JsonXBase {
 public:
 	/**
 	 * Get string form of Json object.
@@ -59,7 +59,7 @@ public:
 	 * @param iss The input stream to read from
 	 * @return Poniter to JsonXValue allocated on heap
 	 */
-	static JsonXValue* read(std::istream& iss);
+	static JsonXBase* read(std::istream& iss);
 
 	/**
 	 * Get type of this value, so RTTI is not required.
@@ -70,7 +70,7 @@ public:
 	/**
 	 * Destructor
 	 */
-	virtual ~JsonXValue() {};
+	virtual ~JsonXBase() {};
 
 	/**
 	 * Skip whitespace from istream.
@@ -93,4 +93,4 @@ public:
 
 } /* namespace JsonX */
 
-#endif /* JSONXVALUE_H_ */
+#endif /* JSONXBASE_H_ */

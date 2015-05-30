@@ -42,9 +42,9 @@ JsonXObject::JsonXObject(initializer_list<JsonXObjectInitEntry> il): m_value
 
 JsonXObject::~JsonXObject() {}
 
-JsonXObject* JsonXObject::add(const string& key, JsonXValue* val) {
+JsonXObject* JsonXObject::add(const string& key, JsonXBase* val) {
 	m_value.get()->push_back(unique_ptr<JsonXObjectEntry>(
-			new JsonXObjectEntry{key, unique_ptr<JsonXValue>(val)}));
+			new JsonXObjectEntry{key, unique_ptr<JsonXBase>(val)}));
 	return this;
 }
 
@@ -60,7 +60,7 @@ string&& JsonXObject::toString() const {
 		if (e) {
 			oss << JsonXString::toJson(e->key);
 			oss << ':';
-			JsonXValue* v{e->val.get()};
+			JsonXBase* v{e->val.get()};
 			oss << (v) ? v->toString() : "null";
 		} else {
 			oss << "null";
@@ -92,7 +92,7 @@ JsonXObject* JsonXObject::read(istream& iss) {
                     "Expected ':'. Got: '" +
 					to_string(static_cast<char>(next_ch)) + "'");
             readChar(iss);;
-            JsonXValue* val = JsonXValue::read(iss);
+            JsonXBase* val = JsonXBase::read(iss);
             items->add(key, move(val));
             next_ch = skipWhitespace(iss);
             if (next_ch == '}')
@@ -118,7 +118,7 @@ bool JsonXObject::contains(const string& key) {
 
 static JsonXNull jxnull{};
 
-const JsonXValue& JsonXObject::find(const string& key) const {
+const JsonXBase& JsonXObject::find(const string& key) const {
 	const JsonXObjectValue& l = *m_value.get();
 	for (JsonXObjectValue::const_iterator i = l.begin();
 			i != l.end(); ++i)
@@ -127,7 +127,7 @@ const JsonXValue& JsonXObject::find(const string& key) const {
 	return jxnull;
 }
 
-JsonXValue&& JsonXObject::find(const string& key) {
+JsonXBase&& JsonXObject::find(const string& key) {
 	const JsonXObjectValue& l = *m_value.get();
 	for (JsonXObjectValue::const_iterator i = l.begin();
 			i != l.end(); ++i)
