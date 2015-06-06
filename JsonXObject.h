@@ -95,6 +95,11 @@ public:
 	virtual ~JsonXObject();
 
 	/**
+	 * Test if the value is set.
+	 */
+	explicit operator bool() const noexcept { return m_value.get(); }
+
+	/**
 	 * Add value to the object with taking ownership
 	 * @param v Value to add
 	 * @return Pointer to itself to allow chaining.

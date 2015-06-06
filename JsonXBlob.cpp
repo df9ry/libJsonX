@@ -31,12 +31,17 @@ JsonXBlob::JsonXBlob(): m_value
 JsonXBlob::JsonXBlob(const JsonXBlobData& value): m_value
 	{unique_ptr<JsonXBlobData>(new JsonXBlobData(value))} {}
 
+JsonXBlob::JsonXBlob(const uint8_t* pb, size_t cb):
+		m_value{new JsonXBlobData(cb)}
+{
+	uninitialized_copy(pb, pb + cb, m_value.get()->begin());
+}
+
 JsonXBlob::JsonXBlob(JsonXBlobData&& value): m_value
 	{unique_ptr<JsonXBlobData>(move(&value))} {}
 
 JsonXBlob::JsonXBlob(initializer_list<uint8_t> il):
 		m_value{new JsonXBlobData(il.size())}
-	//{ for (auto i: il) m_value.get()->push_back(i); }
 {
 	uninitialized_copy(il.begin(), il.begin() + il.size(),
 			m_value.get()->begin());

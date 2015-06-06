@@ -69,6 +69,11 @@ public:
 	virtual ~JsonXArray();
 
 	/**
+	 * Test if the value is set.
+	 */
+	explicit operator bool() const noexcept { return m_value.get(); }
+
+	/**
 	 * Add new value to the list. Takes ownership
 	 * @param v Value to add
 	 * @return Pointer to itself to allow chaining.

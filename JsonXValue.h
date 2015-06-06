@@ -73,6 +73,11 @@ public:
 	~JsonXValue();
 
 	/**
+	 * Test if the value is set.
+	 */
+	explicit operator bool() const noexcept { return m_value.get(); }
+
+	/**
 	 * Copy assignment is deleted.
 	 * @param other Not used.
 	 * @return Not used.

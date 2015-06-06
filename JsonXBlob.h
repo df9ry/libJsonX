@@ -42,6 +42,13 @@ public:
 	JsonXBlob(const JsonXBlobData& value);
 
 	/**
+	 * Constructor.
+	 * @param pb Pointer to data.
+	 * @param cb Size of data.
+	 */
+	JsonXBlob(const uint8_t* pb, size_t cb);
+
+	/**
 	 * Constructor with move.
 	 * @param value The blob value
 	 */
@@ -90,6 +97,11 @@ public:
 	 * Destructor
 	 */
 	virtual ~JsonXBlob();
+
+	/**
+	 * Test if the value is set.
+	 */
+	explicit operator bool() const noexcept { return m_value.get(); }
 
 	/**
 	 * Get string form of Json object.
