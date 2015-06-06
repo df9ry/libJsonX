@@ -30,23 +30,30 @@ using namespace std;
 namespace JsonX {
 
 JsonXValue::JsonXValue():
-	m_value{unique_ptr<JsonXBase>(new JsonXNull())}
+	m_value{unique_ptr<JsonXBase>()}
 {
+	//cerr << "JsonXValue::JsonXValue()" << endl;
 }
 
-JsonXValue::JsonXValue(JsonXValue&& other) {
+JsonXValue::JsonXValue(JsonXValue&& other):
+	m_value{unique_ptr<JsonXBase>()}
+{
+	//cerr << "JsonXValue::JsonXValue(JsonXValue&& other)" << endl;
 	swap(m_value, other.m_value);
 }
 
 JsonXValue::JsonXValue(JsonXBase* v):
 		m_value{unique_ptr<JsonXBase>(v)}
 {
+	//cerr << "JsonXValue::JsonXValue(JsonXBase* v)" << endl;
 }
 
 JsonXValue::~JsonXValue() {
+	//cerr << "JsonXValue::~JsonXValue()" << endl;
 }
 
 JsonXValue& JsonXValue::operator=(JsonXValue&& other) {
+	//cerr << "JsonXValue::operator=(JsonXValue&&)" << endl;
 	swap(m_value, other.m_value);
 	return *this;
 }
