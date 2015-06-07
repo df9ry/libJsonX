@@ -22,12 +22,12 @@ else
 VPATH = $(SRCDIR)
 
 CXXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC -rdynamic \
-			-fmessage-length=0 \
+			-fmessage-length=0 -fexceptions -pthread \
 			-I$(SRCDIR)/../libB64
 			
 
 LDXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC -rdynamic \
-			-fmessage-length=0 \
+			-fmessage-length=0 -fexceptions -pthread \
 			-L../../libB64/_$(_ARCH)-$(_CONF)
 
 OBJS     =  JsonXArray.o \
