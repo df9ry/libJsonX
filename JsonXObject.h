@@ -47,8 +47,7 @@ struct JsonXObjectInitEntry {
 /**
  * Shortcut for value type;
  */
-using JsonXObjectValue = typename
-		std::vector<std::unique_ptr<JsonXObjectEntry>>;
+using JsonXObjectValue = std::vector<std::unique_ptr<JsonXObjectEntry>>;
 
 /**
  * This is a json object.
@@ -97,7 +96,7 @@ public:
 	/**
 	 * Test if the value is set.
 	 */
-	explicit operator bool() const noexcept { return m_value.get(); }
+	explicit operator bool() const noexcept { return (m_value.get() != nullptr); }
 
 	/**
 	 * Add value to the object with taking ownership

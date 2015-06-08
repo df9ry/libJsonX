@@ -23,6 +23,11 @@
 
 #include <string>
 #include <iostream>
+#include <cstdint>
+
+#ifdef _WIN32
+#define noexcept
+#endif
 
 namespace JsonX {
 

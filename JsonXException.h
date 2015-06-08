@@ -31,9 +31,9 @@ public:
 	 * @param what Error text, as usual
 	 */
 	JsonXException(const std::string& what):
-		std::runtime_error{what}, m_inner{nullptr},
-		m_shat{std::runtime_error::what()},
-		m_what{m_shat.c_str()} {}
+		std::runtime_error(what), m_inner(nullptr),
+		m_shat(std::runtime_error::what()),
+		m_what(m_shat.c_str()) {}
 
 	/**
 	 * This package uses JsonXException to be specific.
@@ -43,9 +43,9 @@ public:
 	JsonXException(
 			const std::string& what,
 			const std::exception& inner):
-		std::runtime_error{what}, m_inner{&inner},
-		m_shat{std::string(std::runtime_error::what()) + ": " +
-			inner.what()}, m_what{m_shat.c_str()} {}
+		std::runtime_error(what), m_inner(&inner),
+		m_shat(std::string(std::runtime_error::what()) + ": " +
+			inner.what()), m_what(m_shat.c_str()) {}
 
 	/**
 	 * Destructor.

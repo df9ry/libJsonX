@@ -21,6 +21,12 @@
 
 #include <ctype.h>
 #include <sstream>
+#include <cstdio>
+
+#ifdef _WIN32
+#pragma warning(disable : 4996)
+#define snprintf _snprintf
+#endif
 
 using namespace std;
 
@@ -80,7 +86,7 @@ static uint8_t hex_digit(char ch) {
 }
 
 JsonXString::JsonXString(const string& value):
-	m_value{value} {}
+	m_value(value) {}
 
 string JsonXString::toString() const {
 	return toJson(value());
@@ -144,7 +150,7 @@ JsonXString* JsonXString::read(istream& iss) {
 string JsonXString::readRaw(istream& iss) {
     ostringstream oss{};
     StringState state = StringState::NORMAL;
-    uint u = 0;
+    unsigned int u = 0;
     int next_ch = skipWhitespace(iss);
     if (next_ch != '"')
         throw JsonXException(

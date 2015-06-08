@@ -83,10 +83,10 @@
     <ClInclude Include="JsonXString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JsonXValue.h">
+    <ClInclude Include="ValueType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ValueType.h">
+    <ClInclude Include="Value.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

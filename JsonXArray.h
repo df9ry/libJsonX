@@ -28,8 +28,7 @@
 
 namespace JsonX {
 
-using JsonXArrayData = typename
-	std::vector<std::unique_ptr<JsonXBase>>;
+using JsonXArrayData = std::vector<std::unique_ptr<JsonXBase>>;
 
 /**
  * A JsonXArray holds a list of JsonXValue items.
@@ -71,7 +70,7 @@ public:
 	/**
 	 * Test if the value is set.
 	 */
-	explicit operator bool() const noexcept { return m_value.get(); }
+	explicit operator bool() const noexcept { return (m_value.get() != nullptr); }
 
 	/**
 	 * Add new value to the list. Takes ownership

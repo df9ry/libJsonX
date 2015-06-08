@@ -499,7 +499,7 @@ double JsonXNumber::doubleValue() const {
 		return (static_cast<const JsonXScalar<double, ValueType::T_DOUBLE>*>(this))
 				->value();
 	}
-	return sigIntValue(INT64_MIN, INT64_MAX);
+	return static_cast<double>(sigIntValue(INT64_MIN, INT64_MAX));
 }
 
 } /* namespace JsonX */

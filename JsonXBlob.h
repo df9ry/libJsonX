@@ -25,7 +25,7 @@
 
 namespace JsonX {
 
-using JsonXBlobData = typename std::vector<uint8_t>;
+using JsonXBlobData = std::vector<uint8_t>;
 
 class JsonXBlob: public JsonXBase {
 public:
@@ -101,7 +101,7 @@ public:
 	/**
 	 * Test if the value is set.
 	 */
-	explicit operator bool() const noexcept { return m_value.get(); }
+	explicit operator bool() const noexcept { return (m_value.get() != nullptr); }
 
 	/**
 	 * Get string form of Json object.
