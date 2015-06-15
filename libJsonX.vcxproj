@@ -98,7 +98,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBJSONX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBJSONX_EXPORTS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -155,28 +155,13 @@
     <Text Include="agpl-3.0.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="JsonXArray.cpp" />
-    <ClCompile Include="JsonXBase.cpp" />
-    <ClCompile Include="JsonXBlob.cpp" />
-    <ClCompile Include="JsonXBool.cpp" />
-    <ClCompile Include="JsonXNull.cpp" />
-    <ClCompile Include="JsonXNumber.cpp" />
-    <ClCompile Include="JsonXObject.cpp" />
-    <ClCompile Include="JsonXString.cpp" />
+    <ClCompile Include="Deserialize.cpp" />
     <ClCompile Include="JsonXValue.cpp" />
+    <ClCompile Include="Serialize.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="JsonXArray.h" />
-    <ClInclude Include="JsonXBase.h" />
-    <ClInclude Include="JsonXBlob.h" />
-    <ClInclude Include="JsonXBool.h" />
-    <ClInclude Include="JsonXException.h" />
-    <ClInclude Include="JsonXNull.h" />
-    <ClInclude Include="JsonXNumber.h" />
-    <ClInclude Include="JsonXObject.h" />
-    <ClInclude Include="JsonXString.h" />
-    <ClInclude Include="Value.h" />
-    <ClInclude Include="ValueType.h" />
+    <ClInclude Include="JsonXValue.h" />
+    <ClInclude Include="JsonXType.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libB64\libB64.vcxproj">

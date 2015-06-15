@@ -1,5 +1,5 @@
 /*
-    Project libJsonX
+    Project FreeAX25.TCPServer
     Copyright (C) 2015  tania@df9ry.de
 
     This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "JsonXNull.h"
-#include "JsonXException.h"
+#ifndef JSONXTYPE_H_
+#define JSONXTYPE_H_
 
-using namespace std;
+#include <cstdint>
 
 namespace JsonX {
 
-JsonXNull::JsonXNull() {}
+	enum class Type : std::uint8_t {
+		NONE, SIGNED, UNSIGNED, BOOL, FLOAT,
+		BLOB, STRING, LIST, OBJECT
+	};
 
-JsonXNull::~JsonXNull() {}
+} // end namespace JsonX //
 
-string JsonXNull::toString() const {
-	return "null";
-}
-
-JsonXNull* JsonXNull::read(istream& iss) {
-    skipWhitespace(iss);
-    if (!(
-        (readChar(iss) == 'n') &&
-        (readChar(iss) == 'u') &&
-        (readChar(iss) == 'l') &&
-        (readChar(iss) == 'l')
-        ))
-        throw JsonXException("Invalid null symbol");
-    return new JsonXNull();
-}
-
-} /* namespace JsonX */
+#endif /* JSONXTYPE_H_ */
