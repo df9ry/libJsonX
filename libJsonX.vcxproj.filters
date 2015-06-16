@@ -18,7 +18,6 @@
     <None Include=".gitignore" />
     <None Include="agpl-3.0.html" />
     <None Include="COPYING" />
-    <None Include="JsonXScalar" />
     <None Include="Makefile" />
     <None Include="README" />
     <None Include="target.mk" />

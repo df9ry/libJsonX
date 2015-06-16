@@ -86,12 +86,13 @@ namespace JsonX {
 		const List&   asConstList()   const;
 		const Object& asConstObject() const;
 
-		void reset();
-
 		Value(const Value& other) = delete;
 		Value(Value&& other);
 		Value& operator=(const Value& other) = delete;
 		Value& operator=(Value&& other);
+
+		void reset();
+
 		~Value() { reset(); }
 
 		std::string toJson() const;
