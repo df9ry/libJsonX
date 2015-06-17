@@ -577,7 +577,7 @@ namespace JsonX {
 			} // end while //
 		}
 		readChar(is);
-		return List::make(move(pv));
+		return List::make(pv);
 	}
 
 	ObjectPtr Object::fromJson(std::istream& is) {
@@ -613,11 +613,12 @@ namespace JsonX {
 			} // end while //
 		}
 		readChar(is);
-		return Object::make(move(pv));
+		return Object::make(pv);
 	}
 
 	ValuePtr Value::fromJson(const std::string& s) {
-		return Value::fromJson(stringstream{ s });
+		istringstream is(s);
+		return Value::fromJson(is);
 	}
 
 	ValuePtr Value::fromJson(std::istream& is) {

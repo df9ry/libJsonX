@@ -30,14 +30,8 @@ LDXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC -rdynamic \
 			-fmessage-length=0 -fexceptions -pthread \
 			-L../../libB64/_$(_ARCH)-$(_CONF)
 
-OBJS     =  JsonXArray.o \
-			JsonXBase.o \
-			JsonXBlob.o \
-			JsonXBool.o \
-			JsonXNull.o \
-			JsonXNumber.o \
-			JsonXObject.o \
-			JsonXString.o \
+OBJS     =  Deserialize.o \
+			Serialize.o \
 			JsonXValue.o
 			
 LIBS     =  -lB64 -lpthread

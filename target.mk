@@ -17,12 +17,12 @@
 .SUFFIXES:
 
 ifndef _ARCH
-_ARCH := unknown
+_ARCH := $(shell uname -s)-$(shell uname -m)
 export _ARCH
 endif
 
 ifndef _CONF
-_CONF := debug
+_CONF := Debug
 export _CONF
 endif
 

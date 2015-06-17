@@ -44,7 +44,7 @@ namespace JsonX {
 			os << v_unsigned;
 			break;
 		case Type::BOOL:
-			os << v_bool ? "true" : "false";
+			os << (v_bool ? "true" : "false");
 			break;
 		case Type::FLOAT:
 			os << v_float;
