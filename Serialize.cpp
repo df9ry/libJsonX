@@ -26,7 +26,7 @@ using namespace std;
 
 namespace JsonX {
 
-	std::string Value::toJson() const {
+	std::string Value::toJsonString() const {
 		stringstream os{};
 		toJson(os);
 		return os.str();
@@ -68,12 +68,20 @@ namespace JsonX {
 
 	void Blob::toJson(std::ostream& os) const {
 		const BlobValue& v{ get() };
-		auto i = v.begin();
-		B64::encode([&i, &v](){ return (i != v.end()) ? *++i : -1; },
-			[&os](char ch){ os << ch; });
+		vector<uint8_t>::const_iterator i = v.begin();
+		os << '=';
+		B64::encode([&i, &v]() {
+			int c = (i != v.end()) ? *i : -1;
+			i++;
+			return c;
+		}, [&os](char ch){
+			os << ch;
+		});
+		os << '=';
 	}
 
 	void String::toJson(std::ostream& os, const std::string& s) {
+		os << '"';
 		for (string::const_iterator i = s.begin();
 			i != s.end(); ++i)
 		{

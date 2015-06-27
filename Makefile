@@ -21,14 +21,14 @@ else
 
 VPATH = $(SRCDIR)
 
-CXXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC -rdynamic \
+CXXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC \
 			-fmessage-length=0 -fexceptions -pthread \
 			-I$(SRCDIR)/../libB64
 			
 
-LDXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC -rdynamic \
+LDXFLAGS =	-std=c++11 -pedantic -Wall -g -shared -fPIC \
 			-fmessage-length=0 -fexceptions -pthread \
-			-L../../libB64/_$(_ARCH)-$(_CONF)
+			-L../../libB64/_$(_CONF)
 
 OBJS     =  Deserialize.o \
 			Serialize.o \
@@ -45,8 +45,18 @@ $(TARGET):	$(OBJS)
 	$(CXX) $(CXXFLAGS) -c $<	
 	
 all: $(TARGET)
-	cp ../../libB64/_$(_ARCH)-$(_CONF)/libB64.so .
 	echo "Build OK"
 
+doc: $(DOCDIR)
+	doxygen ../doxygen.conf
+	( cd ../_doc/latex && make )
+	
+install:
+	sudo cp libJsonX.so /usr/local/lib/libJsonX.so.0.1.0
+	( cd /usr/local/lib && sudo chown root:staff libJsonX.so.0.1.0     )
+	( cd /usr/local/lib && sudo chmod 0755       libJsonX.so.0.1.0     )
+	( cd /usr/local/lib && sudo ln -sf libJsonX.so.0.1.0 libJsonX.so.0 )
+	( cd /usr/local/lib && sudo ln -sf libJsonX.so.0.1.0 libJsonX.so   )
+	
 #----- Begin Boilerplate
 endif

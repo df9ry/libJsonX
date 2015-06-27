@@ -23,6 +23,9 @@
 
 namespace JsonX {
 
+	/**
+	 * Type of a value.
+	 */
 	enum class Type : std::uint8_t {
 		NONE, SIGNED, UNSIGNED, BOOL, FLOAT,
 		BLOB, STRING, LIST, OBJECT
