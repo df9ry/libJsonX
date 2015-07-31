@@ -1,9 +1,6 @@
 ### Git ignore file
 
 # Eclipse support:
-.cproject
-.project
-.settings/
 _*/
 
 # VisualStudio support:
