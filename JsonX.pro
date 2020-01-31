@@ -29,4 +29,9 @@ unix {
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    agpl-3.0.html
+    COPYING \
+    README \
+    agpl-3.0.html \
+    agpl-3.0.txt \
+    doxygen.conf \
+    readme.md
