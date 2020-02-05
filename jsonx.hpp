@@ -23,8 +23,8 @@ public:
     // Constructors:
     json()                                          {}
     explicit json(const json& v)                    { copy(v); }
-    explicit json(json& v)                          { copy(v); }
-    explicit json(std::initializer_list<json> v);
+    explicit json(std::initializer_list<json> v);   // Array constructor
+    explicit json(const char *key, const json& v);  // Object constructor
     explicit json(const json_array_t& v)            { copy(v); }
     explicit json(const json_object_t& v)           { copy(v); }
     json(const char *v)                             { copy(v); }
@@ -83,47 +83,95 @@ public:
     uint32_t&            toUnsignedRef32();
     uint16_t&            toUnsignedRef16();
     uint8_t&             toUnsignedRef8();
-    int                  toInteger() const { return toSigned(); }
+    int                  toInteger() const{
+        return static_cast<int>(toSigned());
+    }
     double               toReal() const;
     double&              toRealRef();
-    double               toNumber() { return toReal();   }
-    const json_string_t  toString()    const;
+    double               toNumber() {
+        return toReal();
+    }
+    const json_string_t  toString() const;
           json_string_t  toString();
     const json_string_t& toStringRef() const;
           json_string_t& toStringRef();
-    const json_array_t&  toArray()     const;
+    const json_array_t&  toArray() const;
           json_array_t   toArray();
           json_array_t&  toArrayRef();
-    const json_object_t& toObject()    const;
+    const json_object_t& toObject() const;
           json_object_t  toObject();
           json_object_t& toObjectRef();
 
     // Automatic type conversations:
-    operator const bool()          const { return toBool();          }
-    operator       bool&()               { return toBoolRef();       }
-    operator const int64_t()       const { return toSigned();        }
-    operator const int32_t()       const { return toSigned();        }
-    operator const int16_t()       const { return toSigned();        }
-    operator const int8_t()        const { return toSigned();        }
-    operator       int64_t&()            { return toSignedRef64();   }
-    operator       int32_t&()            { return toSignedRef32();   }
-    operator       int16_t&()            { return toSignedRef16();   }
-    operator       int8_t&()             { return toSignedRef8();    }
-    operator const uint64_t()      const { return toUnsigned();      }
-    operator const uint32_t()      const { return toUnsigned();      }
-    operator const uint16_t()      const { return toUnsigned();      }
-    operator const uint8_t()       const { return toUnsigned();      }
-    operator       uint64_t&()           { return toUnsignedRef64(); }
-    operator       uint32_t&()           { return toUnsignedRef32(); }
-    operator       uint16_t&()           { return toUnsignedRef16(); }
-    operator       uint8_t&()            { return toUnsignedRef8();  }
-    operator const double()        const { return toReal();          }
-    operator       double&()             { return toRealRef();       }
-    operator const json_string_t() const { return toString();        }
-    operator       json_string_t&()      { return toStringRef();     }
+    operator const bool() const {
+        return toBool();
+    }
+    operator bool&() {
+        return toBoolRef();
+    }
+    operator const int64_t() const {
+        return toSigned();
+    }
+    operator const int32_t() const {
+        return static_cast<int32_t>(toSigned());
+    }
+    operator const int16_t() const {
+        return static_cast<int16_t>(toSigned());
+    }
+    operator const int8_t() const {
+        return static_cast<int8_t>(toSigned());
+    }
+    operator int64_t&() {
+        return toSignedRef64();
+    }
+    operator int32_t&() {
+        return toSignedRef32();
+    }
+    operator int16_t&() {
+        return toSignedRef16();
+    }
+    operator int8_t&() {
+        return toSignedRef8();
+    }
+    operator const uint64_t() const {
+        return toUnsigned();
+    }
+    operator const uint32_t() const {
+        return static_cast<uint32_t>(toUnsigned());
+    }
+    operator const uint16_t() const {
+        return static_cast<uint16_t>(toUnsigned());
+    }
+    operator const uint8_t() const {
+        return static_cast<uint8_t>(toUnsigned());
+    }
+    operator uint64_t&() {
+        return toUnsignedRef64();
+    }
+    operator uint32_t&() {
+        return toUnsignedRef32();
+    }
+    operator uint16_t&() {
+        return toUnsignedRef16();
+    }
+    operator uint8_t&() {
+        return toUnsignedRef8();
+    }
+    operator const double() const {
+        return toReal();
+    }
+    operator double&() {
+        return toRealRef();
+    }
+    operator const json_string_t() const {
+        return toString();
+    }
+    operator json_string_t&() {
+        return toStringRef();
+    }
 
     // JSON value:
-    void setUndefined() { clear(); }
+    void setUndefined()              { clear(); }
     void setNull();
     void set(const json& v)          { clear(); copy(v); }
     void set(bool v)                 { clear(); copy(v); }

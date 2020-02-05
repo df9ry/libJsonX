@@ -40,6 +40,11 @@ json::json(initializer_list<json> args): json()
     });
 }
 
+json::json(const char *key, const json& v): json()
+{
+    this->add(key, v);
+}
+
 json::json(DataType t)
 {
     type = t;
@@ -302,7 +307,7 @@ int64_t json::toSigned() const
     case UNSIGNED_INT_T:
         return uint_value;
     case DOUBLE_T:
-        return round(real_value);
+        return static_cast<int64_t>(round(real_value));
     case STRING_T:
         return stoi(*string_value);
     case ARRAY_T:
@@ -355,9 +360,9 @@ uint64_t json::toUnsigned() const
         return uint_value;
     case DOUBLE_T:
         if (real_value > -0.5)
-            return round(real_value);
+            return static_cast<uint64_t>(round(real_value));
         else
-            return 0.0;
+            return 0;
     case STRING_T:
         return stoi(*string_value);
     case ARRAY_T:
@@ -387,9 +392,9 @@ double json::toReal() const
     case BOOL_T:
         return bool_value ? 1.0 : 0.0;
     case SIGNED_INT_T:
-        return int_value;
+        return static_cast<double>(int_value);
     case UNSIGNED_INT_T:
-        return uint_value;
+        return static_cast<double>(uint_value);
     case DOUBLE_T:
         return real_value;
     case STRING_T:
@@ -572,7 +577,7 @@ json& json::at(int i)
         for (int j = 0; j < i; ++j)
             (*array_value)[j].setUndefined();
     } else {
-        while(static_cast<size_t>(i) > array_value->size())
+        while(static_cast<size_t>(i) >= array_value->size())
             array_value->push_back(undefined);
     }
     return (*array_value)[i];
@@ -640,7 +645,9 @@ bool json::operator==(const json &v) const
     case OBJECT_T:
         return operator==(*v.object_value);
     default:
-        cerr << "jsonx::json: Invalid data type " << type << endl;    } // end switch //
+        cerr << "jsonx::json: Invalid data type " << type << endl;
+        return false;
+    } // end switch //
 }
 
 bool json::operator<(const json &v) const
@@ -666,6 +673,7 @@ bool json::operator<(const json &v) const
         return (size() < v.size());
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
+        return false;
     } // end switch //
 }
 
