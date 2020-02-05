@@ -3,6 +3,8 @@
 
 #include <cstdlib>
 #include <iostream>
+
+#undef NDEBUG
 #include <assert.h>
 
 using namespace std;
@@ -45,18 +47,16 @@ int main(int, const char *[])
             json x8("AB\"CD\\EF : \"");
             assert(x8.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
 
-#if 0
             json x9({
                 false,
                 1,
-                json("First",99),
-                json("Second","Blub"),
-                json("Third", true),
+                {jov("First",99),
+                 jov("Second","Blub"),
+                 jov("Third", true)},
                 "Bla"
             });
-            cout << "<" << x9.write() << ">" << endl;
+            //cout << "<" << x9.write() << ">" << endl;
             assert(x9.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
-#endif
         }
         cout << "OK" << endl;
         cout << endl;
@@ -93,17 +93,15 @@ int main(int, const char *[])
             x.set("AB\"CD\\EF : \"");
             assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
 
-#if 0
             x.set(json({
                 false,
                 1,
-                json({json({"First",99}),
-                      json({"Second","Blub"}),
-                      json({"Third", true})}),
+                {jov("First",99),
+                 jov("Second","Blub"),
+                 jov("Third", true)},
                 "Bla"
             }));
             assert(x.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
-#endif
         }
         cout << "OK" << endl;
         cout << endl;
@@ -140,19 +138,16 @@ int main(int, const char *[])
             x = "AB\"CD\\EF : \"";
             assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
 
-#if 0
             x =
             {
                 false,
                 1,
-                json({
-                    json({"First",99}),
-                    json({"Second","Blub"}),
-                    json({"Third", true})}),
+                {jov("First",99),
+                 jov("Second","Blub"),
+                 jov("Third", true)},
                 "Bla"
             };
             assert(x.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
-#endif
         }
         cout << "OK" << endl;
         cout << endl;

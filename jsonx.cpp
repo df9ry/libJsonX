@@ -40,9 +40,11 @@ json::json(initializer_list<json> args): json()
     });
 }
 
-json::json(const char *key, const json& v): json()
+json::json(initializer_list<json_object_value_t> args): json()
 {
-    this->add(key, v);
+    for_each(args.begin(), args.end(), [this](const json_object_value_t& v) {
+        this->add(v.first, v.second);
+    });
 }
 
 json::json(DataType t)
@@ -114,7 +116,8 @@ size_t json::size() const
     case OBJECT_T:
     {
         size_t _size{0};
-        for_each(object_value->begin(), object_value->end(), [&_size](const pair<const string,json>& p) {
+        for_each(object_value->begin(), object_value->end(),
+                 [&_size](const json_object_value_t& p) {
            if (p.second.isDefined())
                _size += 1;
         });
@@ -232,7 +235,7 @@ void json::copy(const json_object_t& v)
 {
     type = OBJECT_T;
     object_value = new json_object_t();
-    for_each(v.begin(), v.end(), [this](const pair<const string, json> p) {
+    for_each(v.begin(), v.end(), [this](const json_object_value_t& p) {
         object_value->emplace(p.first, p.second);
     });
 }
@@ -491,12 +494,14 @@ json_array_t json::toArray()
         j.push_back(json(string_value->c_str()));
         break;
     case ARRAY_T:
-        for_each(array_value->begin(), array_value->end(), [&j](const json& v) {
+        for_each(array_value->begin(), array_value->end(),
+                 [&j](const json& v) {
             j.push_back(v);
         });
         break;
     case OBJECT_T:
-        for_each(object_value->begin(), object_value->end(), [&j](const pair<const string, json>& v) {
+        for_each(object_value->begin(), object_value->end(),
+                 [&j](const json_object_value_t& v) {
             j.push_back(v.second);
         });
         break;
@@ -547,12 +552,14 @@ json_object_t json::toObject()
         m.emplace("0", json(string_value->c_str()));
         break;
     case ARRAY_T:
-        for_each(array_value->begin(), array_value->end(), [&i, &m](const json& v) {
+        for_each(array_value->begin(), array_value->end(),
+                 [&i, &m](const json& v) {
             m.emplace(to_string(i++), v);
         });
         break;
     case OBJECT_T:
-        for_each(object_value->begin(), object_value->end(), [&m](const pair<const string, json>& v) {
+        for_each(object_value->begin(), object_value->end(),
+                 [&m](const json_object_value_t& v) {
             m.emplace(v.first, v.second);
         });
         break;
@@ -692,7 +699,8 @@ bool json::operator==(const json_object_t &v) const
 {
     if ((type != OBJECT_T) || (size() != v.size()))
         return false;
-    auto result_iter = find_if_not(object_value->begin(), object_value->end(), [&v](const pair<const string, json> &left) {
+    auto result_iter = find_if_not(object_value->begin(), object_value->end(),
+                                   [&v](const json_object_value_t &left) {
         const string& left_key = left.first;
         const json& left_val = left.second;
         if (left_val.isDefined()) {

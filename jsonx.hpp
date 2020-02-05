@@ -14,19 +14,20 @@ class scanner;
 
 class json;
 
-typedef std::string                       json_string_t;
-typedef std::vector<json>                 json_array_t;
-typedef std::map<const std::string, json> json_object_t;
+typedef std::string                        json_string_t;
+typedef std::vector<json>                  json_array_t;
+typedef std::map<const std::string, json>  json_object_t;
+typedef std::pair<const std::string, json> json_object_value_t;
 
 class json {
 public:
     // Constructors:
     json()                                          {}
     explicit json(const json& v)                    { copy(v); }
-    explicit json(std::initializer_list<json> v);   // Array constructor
-    explicit json(const char *key, const json& v);  // Object constructor
     explicit json(const json_array_t& v)            { copy(v); }
     explicit json(const json_object_t& v)           { copy(v); }
+    json(std::initializer_list<json> v);                // Array constructor
+    json(std::initializer_list<json_object_value_t> v); // Object constructor
     json(const char *v)                             { copy(v); }
     json(json&& rhs);
     json(bool v)                                    { copy(v); }
@@ -301,6 +302,12 @@ private:
         json_object_t  *object_value;
     };
 }; // end class json //
+
+// Json object value helper:
+static inline json_object_value_t jov(const char *key, const json& val)
+{
+    return json_object_value_t(key, val);
+}
 
 } // end namespace jsonx //
 
