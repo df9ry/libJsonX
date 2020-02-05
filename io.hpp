@@ -11,8 +11,8 @@
 namespace jsonx {
 
 void serialize(std::ostream &os, const std::string &v);
-void serialize(std::ostream &os, const std::vector<json> &v);
-void serialize(std::ostream &os, const std::map<std::string, json> &v);
+void serialize(std::ostream &os, const json_array_t &v);
+void serialize(std::ostream &os, const json_object_t &v);
 
 } // end namespace jsonx //
 

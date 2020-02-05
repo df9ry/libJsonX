@@ -20,7 +20,6 @@ DISTFILES += \
     README \
     agpl-3.0.html \
     agpl-3.0.txt \
-    doxygen.conf \
     readme.md
 
 HEADERS += \

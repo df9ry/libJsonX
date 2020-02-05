@@ -30,7 +30,7 @@ void serialize(ostream &ss, const string &v) {
     ss << "\"";
 }
 
-void serialize(ostream &ss, const vector<json> &v) {
+void serialize(ostream &ss, const json_array_t &v) {
     ss << "[";
     bool first{true};
     for_each (v.begin(), v.end(), [&first, &ss] (const json& v) {
@@ -43,17 +43,19 @@ void serialize(ostream &ss, const vector<json> &v) {
     ss << "]";
 }
 
-void serialize(ostream &ss, const map<string, json> &v) {
+void serialize(ostream &ss, const json_object_t &v) {
     ss << "{";
     bool first{true};
-    for_each (v.begin(), v.end(), [&first, &ss] (const pair<string, json> &v) {
-        if (first)
-            first = false;
-        else
-            ss << ",";
-        serialize(ss, v.first);
-        ss << ":";
-        v.second.write(ss);
+    for_each (v.begin(), v.end(), [&first, &ss] (const pair<const string, json> &v) {
+        if (v.second.isDefined()) {
+            if (first)
+                first = false;
+            else
+                ss << ",";
+            serialize(ss, v.first);
+            ss << ":";
+            v.second.write(ss);
+        }
     });
     ss << "}";
 }
@@ -61,31 +63,30 @@ void serialize(ostream &ss, const map<string, json> &v) {
 void json::write(std::ostream &os) const
 {
     switch (type) {
-    case UNDEFINED:
-        os << "undefined";
+    case UNDEFINED_T:
         break;
-    case NIL:
+    case NULL_T:
         os << "null";
         break;
-    case BOOLEAN:
+    case BOOL_T:
         os << (bool_value ? "true" : "false");
         break;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         os << int_value;
         break;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         os << uint_value;
         break;
-    case DOUBLE:
+    case DOUBLE_T:
         os << real_value;
         break;
-    case STRING:
+    case STRING_T:
         ::jsonx::serialize(os, *string_value);
         break;
-    case ARRAY:
+    case ARRAY_T:
         ::jsonx::serialize(os, *array_value);
         break;
-    case OBJECT:
+    case OBJECT_T:
         ::jsonx::serialize(os, *object_value);
         break;
     default:
@@ -143,8 +144,8 @@ void json::parse(jsonx::scanner &sc)
     switch (sc.cur_ch) {
     case '{':
         {
-            type = OBJECT;
-            object_value = new std::map<std::string, json>();
+            type = OBJECT_T;
+            object_value = new json_object_t();
             sc.get_ch();
             sc.skip_whitespace();
             while (sc.cur_ch != '}') {
@@ -175,8 +176,8 @@ void json::parse(jsonx::scanner &sc)
         break;
     case '[':
         {
-            type = ARRAY;
-            array_value = new std::vector<json>();
+            type = ARRAY_T;
+            array_value = new json_array_t();
             sc.get_ch();
             sc.skip_whitespace();
             while (sc.cur_ch != ']') {
@@ -204,36 +205,36 @@ void json::parse(jsonx::scanner &sc)
         {
             std::string s;
             jsonx::parse_token(sc, s);
-            if (s == "null") {
-                type = NIL;
+            if (s == "") {
+                type = UNDEFINED_T;
                 return;
             }
-            if (s == "undefined") {
-                type = UNDEFINED;
+            if (s == "null") {
+                type = NULL_T;
                 return;
             }
             if (s == "true") {
-                type = BOOLEAN;
+                type = BOOL_T;
                 bool_value = true;
                 return;
             }
             if (s == "false") {
-                type = BOOLEAN;
+                type = BOOL_T;
                 bool_value = false;
                 return;
             }
             if (regex_match(s, UINT_EXPR)) {
-                type = UNSIGNED_INT;
+                type = UNSIGNED_INT_T;
                 uint_value = std::stoull(s);
                 return;
             }
             if (regex_match(s, SINT_EXPR)) {
-                type = SIGNED_INT;
+                type = SIGNED_INT_T;
                 uint_value = std::stoll(s);
                 return;
             }
             if (regex_match(s, REAL_EXPR)) {
-                type = DOUBLE;
+                type = DOUBLE_T;
                 real_value = std::stod(s);
                 return;
             }

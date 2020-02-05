@@ -17,12 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ------------------------------------------------------------------------
 
-Release 0.1.0 as of 2015-06-27, DF9RY - Tania (Tania@DF9RY.de)
+Release 0.2.0 as of 2020-02-04, DF9RY - Tania (Tania@DF9RY.de)
 
-JSON support with a small addition. Values started with "=" and
-followed by a base64 coded value are binary blobs.
-
-Dependencies:
--------------
-
-libB64 : <https://github.com/df9ry/libB64>
+JSON support.

@@ -8,7 +8,55 @@
 #include <assert.h>
 
 using namespace std;
-using namespace jsonx;
+
+namespace jsonx {
+
+class json_const {
+public:
+    static json _undefined;
+    static json _null;
+    static json _array;
+    static json _object;
+
+private:
+    json_const();
+};
+
+json json_const::_undefined{json(json::UNDEFINED_T)};
+json json_const::_null{json(json::NULL_T)};
+json json_const::_array{json(json::ARRAY_T)};
+json json_const::_object{json(json::OBJECT_T)};
+
+const json           json::undefined{json_const::_undefined};
+const json           json::null{json_const::_null};
+const string         empty_string{""};
+const json_array_t   empty_array{};
+const json_object_t  empty_object{};
+
+json::json(initializer_list<json> args): json()
+{
+    for_each(args.begin(), args.end(), [this](const json& j) {
+        this->add(j);
+    });
+}
+
+json::json(DataType t)
+{
+    type = t;
+    switch (type) {
+    case STRING_T:
+        string_value = new string();
+        break;
+    case ARRAY_T:
+        array_value = new json_array_t();
+        break;
+    case OBJECT_T:
+        object_value = new json_object_t();
+        break;
+    default:
+        break;
+    } // end switch //
+}
 
 json::json(json&& rhs)
 {
@@ -16,29 +64,29 @@ json::json(json&& rhs)
         return;
     swap(type, rhs.type);
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         break;
-    case NIL:
+    case NULL_T:
         break;
-    case BOOLEAN:
+    case BOOL_T:
         bool_value = rhs.bool_value;
         break;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         int_value = rhs.int_value;
         break;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         uint_value = rhs.uint_value;
         break;
-    case DOUBLE:
+    case DOUBLE_T:
         real_value = rhs.real_value;
         break;
-    case STRING:
+    case STRING_T:
         swap(string_value, rhs.string_value);
         break;
-    case ARRAY:
+    case ARRAY_T:
         swap(array_value, rhs.array_value);
         break;
-    case OBJECT:
+    case OBJECT_T:
         swap(object_value, rhs.object_value);
         break;
     default:
@@ -51,63 +99,84 @@ json::~json()
     clear();
 }
 
+size_t json::size() const
+{
+    switch (type) {
+    case UNDEFINED_T:
+        return 0;
+    case ARRAY_T:
+        return array_value->size();
+    case OBJECT_T:
+    {
+        size_t _size{0};
+        for_each(object_value->begin(), object_value->end(), [&_size](const pair<const string,json>& p) {
+           if (p.second.isDefined())
+               _size += 1;
+        });
+        return _size;
+    }
+    default:
+        return 1;
+    } // end switch //
+}
+
 void json::clear()
 {
     switch (type) {
-    case UNDEFINED:
-    case NIL:
-    case BOOLEAN:
-    case SIGNED_INT:
-    case UNSIGNED_INT:
-    case DOUBLE:
+    case UNDEFINED_T:
+    case NULL_T:
+    case BOOL_T:
+    case SIGNED_INT_T:
+    case UNSIGNED_INT_T:
+    case DOUBLE_T:
         break;
-    case STRING:
+    case STRING_T:
         delete string_value;
         break;
-    case ARRAY:
+    case ARRAY_T:
         delete array_value;
         break;
-    case OBJECT:
+    case OBJECT_T:
         delete object_value;
         break;
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
     } // end switch //
-    type = UNDEFINED;
+    type = UNDEFINED_T;
 }
 
-void json::setNil()
+void json::setNull()
 {
     clear();
-    type = NIL;
+    type = NULL_T;
 }
 
 void json::copy(const json& v)
 {
     type = v.type;
     switch (type) {
-    case UNDEFINED:
-    case NIL:
+    case UNDEFINED_T:
+    case NULL_T:
         break;
-    case BOOLEAN:
+    case BOOL_T:
         bool_value = v.toBool();
         break;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         int_value = v.toSigned();
         break;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         uint_value = v.toUnsigned();
         break;
-    case DOUBLE:
+    case DOUBLE_T:
         real_value = v.toReal();
         break;
-    case STRING:
-        copy(v.toString());
+    case STRING_T:
+        copy(v.string_value->c_str());
         break;
-    case ARRAY:
+    case ARRAY_T:
         copy(v.toArray());
         break;
-    case OBJECT:
+    case OBJECT_T:
         copy(v.toObject());
         break;
     default:
@@ -117,72 +186,79 @@ void json::copy(const json& v)
 
 void json::copy(bool v)
 {
-    type = BOOLEAN;
+    type = BOOL_T;
     bool_value = v;
 }
 
 void json::copy(int64_t v)
 {
-    type = SIGNED_INT;
+    type = SIGNED_INT_T;
     int_value = v;
 }
 
 void json::copy(uint64_t v)
 {
-    type = UNSIGNED_INT;
+    type = UNSIGNED_INT_T;
     uint_value = v;
 }
 
 void json::copy(double v)
 {
-    type = DOUBLE;
+    type = DOUBLE_T;
     real_value = v;
 }
 
-void json::copy(const string& v)
+void json::copy(const char *v)
 {
-    type = STRING;
+    type = STRING_T;
     string_value = new string(v);
 }
 
-void json::copy(const vector<json>& v)
+void json::copy(const json_array_t& v)
 {
-    type = ARRAY;
-    array_value = new vector<json>();
+    type = ARRAY_T;
+    array_value = new json_array_t();
     for_each(v.begin(), v.end(), [this](const json& j) {
         array_value->push_back(json(j));
     });
 }
 
-void json::copy(const std::map<string, json>& v)
+void json::copy(const json_object_t& v)
 {
-    type = OBJECT;
-    object_value = new map<string, json>();
-    for_each(v.begin(), v.end(), [this](const pair<string, json> p) {
+    type = OBJECT_T;
+    object_value = new json_object_t();
+    for_each(v.begin(), v.end(), [this](const pair<const string, json> p) {
         object_value->emplace(p.first, p.second);
     });
+}
+
+bool& json::toBoolRef()
+{
+    if (type != BOOL_T)
+        set(toBool());
+    return bool_value;
 }
 
 bool json::toBool() const
 {
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         return false;
-    case NIL:
+    case NULL_T:
         return false;
-    case BOOLEAN:
+    case BOOL_T:
         return bool_value;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         return int_value != 0;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         return uint_value != 0;
-    case DOUBLE:
+    case DOUBLE_T:
         return round(real_value) != 0;
-    case STRING:
+    case STRING_T:
         return stoi(*string_value) != 0;
-    case ARRAY:
+    case ARRAY_T:
         return !array_value->empty();
-    case OBJECT:
+    case OBJECT_T:
         return !object_value->empty();
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
@@ -190,59 +266,103 @@ bool json::toBool() const
     } // end switch //
 }
 
+int64_t& json::toSignedRef64()
+{
+    if (type != SIGNED_INT_T)
+        set(toSigned());
+    return int_value;
+}
+
+int32_t& json::toSignedRef32()
+{
+    return reinterpret_cast<int32_t&>(toSignedRef64());
+}
+
+int16_t& json::toSignedRef16()
+{
+    return reinterpret_cast<int16_t&>(toSignedRef64());
+}
+
+int8_t& json::toSignedRef8()
+{
+    return reinterpret_cast<int8_t&>(toSignedRef64());
+}
+
 int64_t json::toSigned() const
 {
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         return 0;
-    case NIL:
+    case NULL_T:
         return 0;
-    case BOOLEAN:
+    case BOOL_T:
         return bool_value ? 1 : 0;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         return int_value;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         return uint_value;
-    case DOUBLE:
+    case DOUBLE_T:
         return round(real_value);
-    case STRING:
+    case STRING_T:
         return stoi(*string_value);
-    case ARRAY:
+    case ARRAY_T:
         return array_value->size();
-    case OBJECT:
+    case OBJECT_T:
         return object_value->size();
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
         return 0;
     } // end switch //
+}
+
+uint64_t& json::toUnsignedRef64()
+{
+    if (type != UNSIGNED_INT_T)
+        set(toUnsigned());
+    return uint_value;
+}
+
+uint32_t& json::toUnsignedRef32()
+{
+    return reinterpret_cast<uint32_t&>(toSignedRef64());
+}
+
+uint16_t& json::toUnsignedRef16()
+{
+    return reinterpret_cast<uint16_t&>(toSignedRef64());
+}
+
+uint8_t& json::toUnsignedRef8()
+{
+    return reinterpret_cast<uint8_t&>(toSignedRef64());
 }
 
 uint64_t json::toUnsigned() const
 {
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         return 0;
-    case NIL:
+    case NULL_T:
         return 0;
-    case BOOLEAN:
+    case BOOL_T:
         return bool_value ? 1 : 0;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         if (int_value >= 0)
             return int_value;
         else
             return 0;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         return uint_value;
-    case DOUBLE:
+    case DOUBLE_T:
         if (real_value > -0.5)
             return round(real_value);
         else
             return 0.0;
-    case STRING:
+    case STRING_T:
         return stoi(*string_value);
-    case ARRAY:
+    case ARRAY_T:
         return array_value->size();
-    case OBJECT:
+    case OBJECT_T:
         return object_value->size();
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
@@ -250,26 +370,33 @@ uint64_t json::toUnsigned() const
     } // end switch //
 }
 
+double& json::toRealRef()
+{
+    if (type != DOUBLE_T)
+        set(toReal());
+    return real_value;
+}
+
 double json::toReal() const
 {
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         return 0.0;
-    case NIL:
+    case NULL_T:
         return 0.0;
-    case BOOLEAN:
+    case BOOL_T:
         return bool_value ? 1.0 : 0.0;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         return int_value;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         return uint_value;
-    case DOUBLE:
+    case DOUBLE_T:
         return real_value;
-    case STRING:
+    case STRING_T:
         return stoi(*string_value);
-    case ARRAY:
+    case ARRAY_T:
         return array_value->size();
-    case OBJECT:
+    case OBJECT_T:
         return object_value->size();
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
@@ -279,59 +406,92 @@ double json::toReal() const
 
 const std::string json::toString() const
 {
-    switch (type) {
-    case UNDEFINED:
-        return "";
-    case NIL:
-        return "null";
-    case BOOLEAN:
-        return bool_value ? "true" : "false";
-    case SIGNED_INT:
-        return to_string(int_value);
-    case UNSIGNED_INT:
-        return to_string(uint_value);
-    case DOUBLE:
-        return to_string(real_value);
-    case STRING:
+    if (type == STRING_T)
         return *string_value;
-    case ARRAY:
-    case OBJECT:
+    else
+        return empty_string;
+}
+
+std::string json::toString()
+{
+    switch (type) {
+    case UNDEFINED_T:
+        return "";
+    case NULL_T:
+        return "null";
+    case BOOL_T:
+        return bool_value ? "true" : "false";
+    case SIGNED_INT_T:
+        return to_string(int_value);
+    case UNSIGNED_INT_T:
+        return to_string(uint_value);
+    case DOUBLE_T:
+        return to_string(real_value);
+    case STRING_T:
+        return *string_value;
+    case ARRAY_T:
+    case OBJECT_T:
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
         return 0;
     } // end switch //
 }
 
-const std::vector<json> json::toArray() const
+std::string& json::toStringRef()
 {
-    vector<json> j;
+    if (type != STRING_T) {
+        set(toString());
+    }
+    return *string_value;
+}
+
+const std::string& json::toStringRef() const
+{
+    if (type != STRING_T) {
+        return empty_string;
+    } else {
+        return *string_value;
+    }
+}
+
+const json_array_t& json::toArray() const
+{
+    if (type == ARRAY_T)
+        return *array_value;
+    else
+        return empty_array;
+}
+
+json_array_t json::toArray()
+{
+    json_array_t j;
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         break;
-    case NIL:
+    case NULL_T:
         break;
-    case BOOLEAN:
+    case BOOL_T:
         j.push_back(json(bool_value ? "true" : "false"));
         break;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         j.push_back(json(int_value));
         break;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         j.push_back(json(uint_value));
         break;
-    case DOUBLE:
+    case DOUBLE_T:
         j.push_back(json(real_value));
         break;
-    case STRING:
-        j.push_back(json(*string_value));
+    case STRING_T:
+        j.push_back(json(string_value->c_str()));
         break;
-    case ARRAY:
+    case ARRAY_T:
         for_each(array_value->begin(), array_value->end(), [&j](const json& v) {
             j.push_back(v);
         });
         break;
-    case OBJECT:
-        for_each(object_value->begin(), object_value->end(), [&j](const pair<string, json>& v) {
+    case OBJECT_T:
+        for_each(object_value->begin(), object_value->end(), [&j](const pair<const string, json>& v) {
             j.push_back(v.second);
         });
         break;
@@ -341,37 +501,53 @@ const std::vector<json> json::toArray() const
     return j;
 }
 
-const std::map<string, json> json::toObject() const
+json_array_t& json::toArrayRef()
 {
-    map<string, json> m;
+    if (type != ARRAY_T) {
+        set(toArray());
+    }
+    return *array_value;
+}
+
+const json_object_t& json::toObject() const
+{
+    if (type == OBJECT_T)
+        return *object_value;
+    else
+        return empty_object;
+}
+
+json_object_t json::toObject()
+{
+    json_object_t m;
     size_t i{0};
     switch (type) {
-    case UNDEFINED:
+    case UNDEFINED_T:
         break;
-    case NIL:
+    case NULL_T:
         break;
-    case BOOLEAN:
+    case BOOL_T:
         m.emplace("0", json(bool_value ? "true" : "false"));
         break;
-    case SIGNED_INT:
+    case SIGNED_INT_T:
         m.emplace("0", json(int_value));
         break;
-    case UNSIGNED_INT:
+    case UNSIGNED_INT_T:
         m.emplace("0", json(uint_value));
         break;
-    case DOUBLE:
+    case DOUBLE_T:
         m.emplace("0", json(real_value));
         break;
-    case STRING:
-        m.emplace("0", json(*string_value));
+    case STRING_T:
+        m.emplace("0", json(string_value->c_str()));
         break;
-    case ARRAY:
+    case ARRAY_T:
         for_each(array_value->begin(), array_value->end(), [&i, &m](const json& v) {
             m.emplace(to_string(i++), v);
         });
         break;
-    case OBJECT:
-        for_each(object_value->begin(), object_value->end(), [&m](const pair<string, json>& v) {
+    case OBJECT_T:
+        for_each(object_value->begin(), object_value->end(), [&m](const pair<const string, json>& v) {
             m.emplace(v.first, v.second);
         });
         break;
@@ -381,25 +557,144 @@ const std::map<string, json> json::toObject() const
     return m;
 }
 
+json_object_t& json::toObjectRef()
+{
+    if (type == OBJECT_T) {
+        set(toObject());
+    }
+    return *object_value;
+}
+
+json& json::at(int i)
+{
+    if (type != ARRAY_T) {
+        set(toArray());
+        for (int j = 0; j < i; ++j)
+            (*array_value)[j].setUndefined();
+    } else {
+        while(static_cast<size_t>(i) > array_value->size())
+            array_value->push_back(undefined);
+    }
+    return (*array_value)[i];
+}
+
+json& json::find(const char *key)
+{
+    json_object_t::iterator iter;
+    if (type != OBJECT_T) {
+        set(toObject());
+        iter = object_value->end();
+    } else {
+        iter = object_value->find(key);
+    }
+    if (iter == object_value->end())
+        iter = object_value->emplace(key, undefined).first;
+    return iter->second;
+}
+
 void json::add(const json &j)
 {
-    if (type != ARRAY) {
+    if (type != ARRAY_T) {
         clear();
-        array_value = new vector<json>();
-        type = ARRAY;
+        array_value = new json_array_t();
+        type = ARRAY_T;
     }
-    array_value->push_back(j);
+    if (j.isDefined())
+        array_value->push_back(j);
 }
 
 void json::add(const string &key, const json &j)
 {
-    if (type != OBJECT) {
+    if (type != OBJECT_T) {
         clear();
-        object_value = new map<string, json>();
-        type = OBJECT;
+        object_value = new json_object_t();
+        type = OBJECT_T;
     }
     auto iter = object_value->find(key);
     if (iter != object_value->end())
         object_value->erase(iter);
     object_value->emplace(key, j);
 }
+
+bool json::operator==(const json &v) const
+{
+    if (type != v.type)
+        return false;
+    switch (type) {
+    case UNDEFINED_T:
+        return false; // Undefined never equals anything!
+    case NULL_T:
+        return true;
+    case BOOL_T:
+        return (bool_value == v.bool_value);
+    case SIGNED_INT_T:
+        return (int_value == v.int_value);
+    case UNSIGNED_INT_T:
+        return (uint_value == v.uint_value);
+    case DOUBLE_T:
+        return (real_value == v.real_value);
+    case STRING_T:
+        return (*string_value == *v.string_value);
+    case ARRAY_T:
+        return operator==(*v.array_value);
+    case OBJECT_T:
+        return operator==(*v.object_value);
+    default:
+        cerr << "jsonx::json: Invalid data type " << type << endl;    } // end switch //
+}
+
+bool json::operator<(const json &v) const
+{
+    if (type != v.type)
+        return false;
+    switch (type) {
+    case UNDEFINED_T:
+        return false; // Undefined is never less than anything!
+    case NULL_T:
+        return false;
+    case BOOL_T:
+        return (bool_value < v.bool_value);
+    case SIGNED_INT_T:
+        return (int_value < v.int_value);
+    case UNSIGNED_INT_T:
+        return (uint_value < v.uint_value);
+    case DOUBLE_T:
+        return (real_value < v.real_value);
+    case STRING_T:
+    case ARRAY_T:
+    case OBJECT_T:
+        return (size() < v.size());
+    default:
+        cerr << "jsonx::json: Invalid data type " << type << endl;
+    } // end switch //
+}
+
+bool json::operator==(const json_array_t &v) const
+{
+    if ((type != ARRAY_T) || (size() != v.size()))
+        return false;
+    for (size_t i = 0; i < size(); ++i) {
+        if (!((*array_value)[i]).operator==(v[i]))
+            return false;
+    } // end for //
+    return true;
+}
+
+bool json::operator==(const json_object_t &v) const
+{
+    if ((type != OBJECT_T) || (size() != v.size()))
+        return false;
+    auto result_iter = find_if_not(object_value->begin(), object_value->end(), [&v](const pair<const string, json> &left) {
+        const string& left_key = left.first;
+        const json& left_val = left.second;
+        if (left_val.isDefined()) {
+            auto iter = v.find(left_key);
+            return ((iter != v.end() && left_val.operator==(iter->second)));
+        } else {
+            return true;
+        }
+    });
+    return (result_iter == object_value->end());
+}
+
+} // end namespace jsonx //

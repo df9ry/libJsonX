@@ -16,13 +16,13 @@ int main(int, const char *[])
     try {
         cout << "Testing constructors:" << endl;
         {
-            json x1(undefined);
+            json x1{json::undefined};
             assert(!x1.isDefined());
-            assert(x1.write() == "undefined");
+            assert(x1.write() == "");
 
-            json x2(null);
+            json x2(json::null);
             assert(x2.isDefined());
-            assert(x2.isNil());
+            assert(x2.isNull());
             assert(x2.write() == "null");
 
             json x3(true);
@@ -51,6 +51,7 @@ int main(int, const char *[])
                 json({{"First",99},{"Second","Blub"},{"Third", true}}),
                 "Bla"
             });
+            cout << "<" << x9.write() << ">" << endl;
             assert(x9.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
         }
         cout << "OK" << endl;
@@ -61,11 +62,11 @@ int main(int, const char *[])
             json x;
             x.setUndefined();
             assert(!x.isDefined());
-            assert(x.write() == "undefined");
+            assert(x.write() == "");
 
-            x.setNil();
+            x.setNull();
             assert(x.isDefined());
-            assert(x.isNil());
+            assert(x.isNull());
             assert(x.write() == "null");
 
             x.set(true);
@@ -102,13 +103,13 @@ int main(int, const char *[])
         cout << "Testing right assignments:" << endl;
         {
             json x;
-            x = undefined;
+            x.setUndefined();
             assert(!x.isDefined());
-            assert(x.write() == "undefined");
+            assert(x.write() == "");
 
-            x = null;
+            x.setNull();
             assert(x.isDefined());
-            assert(x.isNil());
+            assert(x.isNull());
             assert(x.write() == "null");
 
             x = true;
@@ -168,6 +169,7 @@ int main(int, const char *[])
             assert(d == 11.31);
 
             x = "AB\"CD\\EF : \"";
+            assert(x == "AB\"CD\\EF : \"");
             string s = x;
             assert(s == "AB\"CD\\EF : \"");
         }
@@ -177,11 +179,9 @@ int main(int, const char *[])
         cout << "Testing deserialization:" << endl;
         {
             json x;
-            x.parse("null");
-            assert(x.isNil());
 
-            x.parse("undefined");
-            assert(!x.isDefined());
+            x.parse("null");
+            assert(x.isNull());
 
             x.parse("true");
             assert(x.isBool());
@@ -236,6 +236,95 @@ int main(int, const char *[])
 
             x.parse("[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
             assert(x.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
+        }
+        cout << "OK" << endl;
+        cout << endl;
+
+        cout << "Testing array subscription:" << endl;
+        {
+            json x;
+
+            x.parse("[null,null,1,null,\"Bla\"]");
+            assert(x.size() == 5);
+            assert(x[0].isNull());
+            assert(x[1].isNull());
+            assert(x[2].isInteger());
+            assert(x[3].isNull());
+            assert(x[4].isString());
+            assert(!x[5].isDefined());
+
+            //cout << "<" << x[2] << ">" << endl;
+            assert(x[2].toInteger() == 1);
+            assert(x[4].toString() == "Bla");
+
+            int i1 = x[2];
+            assert(i1 = 1);
+            string s1 = x[4];
+            assert(s1 == "Bla");
+
+            i1 = x[2];
+            assert(i1 == 1);
+            x[2] = 5;
+            i1 = x[2];
+            assert(i1 == 5);
+            x[2] = false;
+            assert(!x[2]);
+
+            assert(x[4] == "Bla");
+            x[4] = "Blub";
+            assert(x[4] == "Blub");
+
+            x[7].setNull();
+            json y{x[5]};
+            assert(y != json::undefined);
+            assert(!y.isDefined());
+            assert(!x[6].isDefined());
+            assert(x[7] == json::null);
+
+            assert(x.size() == 7);
+            x.add(json::undefined);
+            assert(x[7].isNull());
+            assert(x.size() == 7);
+            x.add(json{"Prima", json{"Klima", 12}});
+            //cout << x.write() << endl;
+            assert(x[7].isArray());
+            assert(x.size() == 8);
+
+            x[0] = 10.1;
+            x[1] = 20.2;
+            assert(x[0] < x[1]);
+        }
+        cout << "OK" << endl;
+        cout << endl;
+
+        cout << "Testing object subscription:" << endl;
+        {
+            json x;
+            assert(!x["Mama"].isDefined());
+            assert(!x["Mama"].isDefined());
+            x["Mama"] = "Maria";
+            assert(x["Mama"].isDefined());
+            x["Papa"] = "Josef";
+            assert(x["Mama"].isDefined());
+            assert(x["Papa"].isDefined());
+            assert(!x["Nanu"].isDefined());
+            assert(!x["Nana"].isDefined());
+            assert(x["Mama"] == "Maria");
+            string s1 = x["Mama"];
+            assert(s1 == "Maria");
+            assert(x["Papa"] == "Josef");
+            string s2 = x["Papa"];
+            assert(s2 == "Josef");
+            x["Jahr"] = 2020;
+            int j = x["Jahr"];
+            assert(j == 2020);
+            x["Schaltjahr"] = false;
+            assert(!x["Schaltjahr"]);
+            x["Prozent"] = 99.9;
+            double d1 = x["Prozent"];
+            assert(d1 == 99.9);
+            string s3 = x.write();
+            assert(s3 == "{\"Jahr\":2020,\"Mama\":\"Maria\",\"Papa\":\"Josef\",\"Prozent\":99.9,\"Schaltjahr\":false}");
         }
         cout << "OK" << endl;
         cout << endl;
