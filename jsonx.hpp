@@ -104,22 +104,22 @@ public:
           json_object_t& toObjectRef();
 
     // Automatic type conversations:
-    operator const bool() const {
+    operator bool() const {
         return toBool();
     }
     operator bool&() {
         return toBoolRef();
     }
-    operator const int64_t() const {
+    operator int64_t() const {
         return toSigned();
     }
-    operator const int32_t() const {
+    operator int32_t() const {
         return static_cast<int32_t>(toSigned());
     }
-    operator const int16_t() const {
+    operator int16_t() const {
         return static_cast<int16_t>(toSigned());
     }
-    operator const int8_t() const {
+    operator int8_t() const {
         return static_cast<int8_t>(toSigned());
     }
     operator int64_t&() {
@@ -134,16 +134,16 @@ public:
     operator int8_t&() {
         return toSignedRef8();
     }
-    operator const uint64_t() const {
+    operator uint64_t() const {
         return toUnsigned();
     }
-    operator const uint32_t() const {
+    operator uint32_t() const {
         return static_cast<uint32_t>(toUnsigned());
     }
-    operator const uint16_t() const {
+    operator uint16_t() const {
         return static_cast<uint16_t>(toUnsigned());
     }
-    operator const uint8_t() const {
+    operator uint8_t() const {
         return static_cast<uint8_t>(toUnsigned());
     }
     operator uint64_t&() {
@@ -158,7 +158,7 @@ public:
     operator uint8_t&() {
         return toUnsignedRef8();
     }
-    operator const double() const {
+    operator double() const {
         return toReal();
     }
     operator double&() {

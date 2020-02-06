@@ -18,7 +18,7 @@ int main(int, const char *[])
     try {
         cout << "Testing constructors:" << endl;
         {
-            json x1{json::undefined};
+            json x1(json::undefined);
             assert(!x1.isDefined());
             assert(x1.write() == "");
 
@@ -283,7 +283,7 @@ int main(int, const char *[])
             assert(x[4] == "Blub");
 
             x[7].setNull();
-            json y{x[5]};
+            json y(x[5]);
             assert(y != json::undefined);
             assert(!y.isDefined());
             assert(!x[6].isDefined());
