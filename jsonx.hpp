@@ -169,6 +169,9 @@ public:
     operator json_string_t&() {
         return toStringRef();
     }
+    operator const char*() {
+        return toStringRef().c_str();
+    }
 
     // JSON value:
     void setUndefined()              { clear(); }
