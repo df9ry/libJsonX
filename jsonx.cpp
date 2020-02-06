@@ -33,18 +33,22 @@ const string         empty_string{""};
 const json_array_t   empty_array{};
 const json_object_t  empty_object{};
 
-json::json(initializer_list<json> args): json()
+json jarray(initializer_list<json> args)
 {
-    for_each(args.begin(), args.end(), [this](const json& j) {
-        this->add(j);
+    json rg(empty_array);
+    for_each(args.begin(), args.end(), [&rg](const json& j) {
+        rg.add(j);
     });
+    return rg;
 }
 
-json::json(initializer_list<json_object_value_t> args): json()
+json jobject(initializer_list<json_object_value_t> args)
 {
-    for_each(args.begin(), args.end(), [this](const json_object_value_t& v) {
-        this->add(v.first, v.second);
+    json obj(empty_object);
+    for_each(args.begin(), args.end(), [&obj](const json_object_value_t& v) {
+        obj.add(v.first, v.second);
     });
+    return obj;
 }
 
 json::json(DataType t)

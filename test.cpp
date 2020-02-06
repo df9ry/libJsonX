@@ -47,12 +47,14 @@ int main(int, const char *[])
             json x8("AB\"CD\\EF : \"");
             assert(x8.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
 
-            json x9({
+            json x9 = jarray({
                 false,
                 1,
-                {jov("First",99),
-                 jov("Second","Blub"),
-                 jov("Third", true)},
+                jobject({
+                    jitem("First",99),
+                    jitem("Second","Blub"),
+                    jitem("Third", true)
+                }),
                 "Bla"
             });
             //cout << "<" << x9.write() << ">" << endl;
@@ -96,9 +98,11 @@ int main(int, const char *[])
             x.set(json({
                 false,
                 1,
-                {jov("First",99),
-                 jov("Second","Blub"),
-                 jov("Third", true)},
+                jobject({
+                    jitem("First",99),
+                    jitem("Second","Blub"),
+                    jitem("Third", true)
+                }),
                 "Bla"
             }));
             assert(x.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
@@ -138,13 +142,14 @@ int main(int, const char *[])
             x = "AB\"CD\\EF : \"";
             assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
 
-            x =
-            {
+            x = {
                 false,
                 1,
-                {jov("First",99),
-                 jov("Second","Blub"),
-                 jov("Third", true)},
+                jobject({
+                    jitem("First",99),
+                    jitem("Second","Blub"),
+                    jitem("Third", true)
+                }),
                 "Bla"
             };
             assert(x.write() == "[false,1,{\"First\":99,\"Second\":\"Blub\",\"Third\":true},\"Bla\"]");
@@ -293,7 +298,7 @@ int main(int, const char *[])
             x.add(json::undefined);
             assert(x[7].isNull());
             assert(x.size() == 8);
-            x.add(json{"Prima", json{"Klima", 12}});
+            x.add(jarray({"Prima", jobject({jitem("Klima", 12)})}));
             //cout << x.write() << endl;
             assert(x[8].isArray());
             assert(x.size() == 9);

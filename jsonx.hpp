@@ -23,11 +23,9 @@ class json {
 public:
     // Constructors:
     json()                                          {}
-    explicit json(const json& v)                    { copy(v); }
-    explicit json(const json_array_t& v)            { copy(v); }
-    explicit json(const json_object_t& v)           { copy(v); }
-    json(std::initializer_list<json> v);                // Array constructor
-    json(std::initializer_list<json_object_value_t> v); // Object constructor
+    json(const json& v)                             { copy(v); }
+    json(const json_array_t& v)                     { copy(v); }
+    json(const json_object_t& v)                    { copy(v); }
     json(const char *v)                             { copy(v); }
     json(json&& rhs);
     json(bool v)                                    { copy(v); }
@@ -304,10 +302,14 @@ private:
 }; // end class json //
 
 // Json object value helper:
-static inline json_object_value_t jov(const char *key, const json& val)
+inline json_object_value_t jitem(const char *key, const json& val)
 {
     return json_object_value_t(key, val);
 }
+
+json jarray(std::initializer_list<json> v);
+
+json jobject(std::initializer_list<json_object_value_t> v);
 
 } // end namespace jsonx //
 
