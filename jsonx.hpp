@@ -27,6 +27,7 @@ public:
     json(const json_array_t& v)                     { copy(v); }
     json(const json_object_t& v)                    { copy(v); }
     json(const char *v)                             { copy(v); }
+    json(const std::string& v)                      { copy(v.c_str()); }
     json(json&& rhs);
     json(bool v)                                    { copy(v); }
     json(int64_t v)                                 { copy(v); }
@@ -244,9 +245,10 @@ public:
 
     // Subscriptions:
     json& at(int i);
-    json& operator[] (int i)           { return at(i); }
+    json& operator[] (int i)                  { return at(i);             }
     json& find(const char *key);
-    json& operator[] (const char *key) { return find(key); }
+    json& operator[] (const char *key)        { return find(key);         }
+    json& operator[] (const std::string& key) { return find(key.c_str()); }
 
 private:
     typedef enum {
