@@ -18,30 +18,33 @@ typedef std::string                        json_string_t;
 typedef std::vector<json>                  json_array_t;
 typedef std::map<const std::string, json>  json_object_t;
 typedef std::pair<const std::string, json> json_object_value_t;
+typedef int                                json_index_t;
+typedef double                             json_real_t;
 
 class json {
 public:
     // Constructors:
-    json()                                          {}
-    json(const json& v)                             { copy(v); }
-    json(const json_array_t& v)                     { copy(v); }
-    json(const json_object_t& v)                    { copy(v); }
-    json(const char *v)                             { copy(v); }
-    json(const std::string& v)                      { copy(v.c_str()); }
+    json() {}
+    json(const json& rhs): json() { copyFrom(rhs); }
     json(json&& rhs);
-    json(bool v)                                    { copy(v); }
-    json(int64_t v)                                 { copy(v); }
-    json(int8_t v) :json(static_cast<int64_t>(v))   {}
-    json(int16_t v):json(static_cast<int64_t>(v))   {}
-    json(int32_t v):json(static_cast<int64_t>(v))   {}
-    json(uint64_t v)                                { copy(v); }
-    json(uint8_t v) :json(static_cast<uint64_t>(v)) {}
-    json(uint16_t v):json(static_cast<uint64_t>(v)) {}
-    json(uint32_t v):json(static_cast<uint64_t>(v)) {}
-    json(double v)                                  { copy(v); }
+    json(const json_array_t& rhs): json() { copyFrom(rhs); }
+    json(const json_object_t& rhs): json() { copyFrom(rhs); }
+    json(const char *rhs): json() { copyFrom(rhs); }
+    json(const std::string& rhs): json() { copyFrom(rhs.c_str()); }
+    json(bool rhs): json() { copyFrom(rhs); }
+    json(int64_t rhs): json() { copyFrom(rhs); }
+    json(int8_t rhs): json(static_cast<int64_t>(rhs)) {}
+    json(int16_t rhs): json(static_cast<int64_t>(rhs)) {}
+    json(int32_t rhs): json(static_cast<int64_t>(rhs)) {}
+    json(uint64_t rhs): json() { copyFrom(rhs); }
+    json(uint8_t rhs): json(static_cast<uint64_t>(rhs)) {}
+    json(uint16_t rhs): json(static_cast<uint64_t>(rhs)) {}
+    json(uint32_t rhs): json(static_cast<uint64_t>(rhs)) {}
+    json(float rhs): json() { copyFrom(static_cast<json_real_t>(rhs)); }
+    json(double rhs): json() { copyFrom(static_cast<json_real_t>(rhs)); }
 
     // Destructor:
-    ~json();
+    virtual ~json();
 
     // Operations:
     void clear();
@@ -49,62 +52,91 @@ public:
 
     // IO:
     void write(std::ostream &os) const;
-    json_string_t write() const         { std::ostringstream os; write(os); return os.str(); }
+    json_string_t write() const {
+        std::ostringstream os;
+        write(os);
+        return os.str();
+    }
     void parse(std::istream &is);
-    void parse(const json_string_t &s)  { std::istringstream is(s); parse(is); }
+    void parse(const json_string_t &s) {
+        std::istringstream is(s);
+        parse(is);
+    }
 
     // Type checks:
-    bool isDefined()  const { return type != UNDEFINED_T; }
-    bool isNull()     const { return type == NULL_T; }
-    bool isBool()     const { return type == BOOL_T; }
-    bool isSigned()   const { return type == SIGNED_INT_T; }
-    bool isUnsigned() const { return type == UNSIGNED_INT_T; }
-    bool isInteger()  const { return type == SIGNED_INT_T || type == UNSIGNED_INT_T; }
-    bool isReal()     const { return type == DOUBLE_T; }
-    bool isNumber()   const { return isReal() || isInteger(); }
-    bool isString()   const { return type == STRING_T; }
-    bool isArray()    const { return type == ARRAY_T; }
-    bool isObject()   const { return type == OBJECT_T; }
+    bool isDefined() const {
+        return type != UNDEFINED_T;
+    }
+    bool isNull() const {
+        return type == NULL_T;
+    }
+    bool isBool() const {
+        return type == BOOL_T;
+    }
+    bool isSigned() const {
+        return type == SIGNED_T;
+    }
+    bool isUnsigned() const {
+        return type == UNSIGNED_T;
+    }
+    bool isInt() const {
+        return type == SIGNED_T || type == UNSIGNED_T;
+    }
+    bool isReal() const {
+        return type == REAL_T;
+    }
+    bool isNumber() const {
+        return isReal() || isInt();
+    }
+    bool isString() const {
+        return type == STRING_T;
+    }
+    bool isArray() const {
+        return type == ARRAY_T;
+    }
+    bool isObject() const {
+        return type == OBJECT_T;
+    }
 
     // Constants:
-    static const json     undefined;
-    static const json     null;
+    static const json undefined;
+    static const json null;
 
     // Type conversions:
-    bool                 toBool() const;
-    bool&                toBoolRef();
-    int64_t              toSigned() const;
-    int64_t&             toSignedRef64();
-    int32_t&             toSignedRef32();
-    int16_t&             toSignedRef16();
-    int8_t&              toSignedRef8();
-    uint64_t             toUnsigned() const;
-    uint64_t&            toUnsignedRef64();
-    uint32_t&            toUnsignedRef32();
-    uint16_t&            toUnsignedRef16();
-    uint8_t&             toUnsignedRef8();
-    int                  toInteger() const{
+    bool toBool() const;
+    bool& toBoolRef();
+    int64_t toSigned() const;
+    int64_t& toSignedRef64();
+    int32_t& toSignedRef32();
+    int16_t& toSignedRef16();
+    int8_t& toSignedRef8();
+    uint64_t toUnsigned() const;
+    uint64_t& toUnsignedRef64();
+    uint32_t& toUnsignedRef32();
+    uint16_t& toUnsignedRef16();
+    uint8_t& toUnsignedRef8();
+    int toInt() const {
         return static_cast<int>(toSigned());
     }
-    double               toReal() const;
-    double&              toRealRef();
-    double               toNumber() {
+    json_real_t toReal() const;
+    json_real_t& toRealRef();
+    json_real_t toNumber() {
         return toReal();
     }
-          json_string_t  toString() const;
-          json_string_t  toString();
+    json_string_t toString() const;
+    json_string_t toString();
     const json_string_t& toStringRef() const;
-          json_string_t& toStringRef();
-    const json_array_t&  toArray() const;
-          json_array_t   toArray();
-    const json_array_t&  toArrayRef() const;
-          json_array_t&  toArrayRef();
+    json_string_t& toStringRef();
+    const json_array_t& toArray() const;
+    json_array_t toArray();
+    const json_array_t& toArrayRef() const;
+    json_array_t& toArrayRef();
     const json_object_t& toObject() const;
-          json_object_t  toObject();
+    json_object_t toObject();
     const json_object_t& toObjectRef() const;
-          json_object_t& toObjectRef();
+    json_object_t& toObjectRef();
     const char *c_str() const {
-          return toStringRef().c_str();
+        return toStringRef().c_str();
     }
 
     // Automatic type conversations:
@@ -162,10 +194,13 @@ public:
     operator uint8_t&() {
         return toUnsignedRef8();
     }
-    operator double() const {
-        return toReal();
+    operator float() const {
+        return static_cast<float>(toReal());
     }
-    operator double&() {
+    operator double() const {
+        return static_cast<double>(toReal());
+    }
+    operator json_real_t&() {
         return toRealRef();
     }
     operator const json_string_t&() const {
@@ -176,23 +211,77 @@ public:
     }
 
     // JSON value:
-    void setUndefined()              { clear(); }
+    void setUndefined() {
+        clear();
+    }
     void setNull();
-    void set(const json& v)          { clear(); copy(v); }
-    void set(bool v)                 { clear(); copy(v); }
-    void set(int8_t v)               { clear(); copy(static_cast<int64_t>(v)); }
-    void set(uint8_t v)              { clear(); copy(static_cast<uint64_t>(v)); }
-    void set(int16_t v)              { clear(); copy(static_cast<int64_t>(v)); }
-    void set(uint16_t v)             { clear(); copy(static_cast<uint64_t>(v)); }
-    void set(int32_t v)              { clear(); copy(static_cast<int64_t>(v)); }
-    void set(uint32_t v)             { clear(); copy(static_cast<uint64_t>(v)); }
-    void set(int64_t v)              { clear(); copy(v); }
-    void set(uint64_t v)             { clear(); copy(v); }
-    void set(double v)               { clear(); copy(v); }
-    void set(const json_string_t& v) { clear(); copy(v.c_str()); }
-    void set(const char *v)          { clear(); copy(v); }
-    void set(const json_array_t& v)  { clear(); copy(v); }
-    void set(const json_object_t& v) { clear(); copy(v); }
+    void set(const json& v) {
+        clear();
+        copyFrom(v);
+    }
+    void set(bool v) {
+        clear();
+        copyFrom(v);
+    }
+    void set(int8_t v) {
+        clear();
+        copyFrom(static_cast<int64_t>(v));
+    }
+    void set(uint8_t v) {
+        clear();
+        copyFrom(static_cast<uint64_t>(v));
+    }
+    void set(int16_t v) {
+        clear();
+        copyFrom(static_cast<int64_t>(v));
+    }
+    void set(uint16_t v) {
+        clear();
+        copyFrom(static_cast<uint64_t>(v));
+    }
+    void set(int32_t v) {
+        clear();
+        copyFrom(static_cast<int64_t>(v));
+    }
+    void set(uint32_t v) {
+        clear();
+        copyFrom(static_cast<uint64_t>(v));
+    }
+    void set(int64_t v) {
+        clear();
+        copyFrom(v);
+    }
+    void set(uint64_t v) {
+        clear();
+        copyFrom(v);
+    }
+    void set(float v) {
+        clear();
+        copyFrom(static_cast<json_real_t>(v));
+    }
+    void set(double v) {
+        clear();
+        copyFrom(static_cast<json_real_t>(v));
+    }
+    void set(const json_string_t& v) {
+        set(v.c_str());
+    }
+    void set(const char *v) {
+        if (type == STRING_T) {
+            *string_value = v;
+        } else {
+            clear();
+            copyFrom(v);
+        }
+    }
+    void set(const json_array_t& v) {
+        clear();
+        copyFrom(v);
+    }
+    void set(const json_object_t& v) {
+        clear();
+        copyFrom(v);
+    }
 
     // Assignments:
     void operator=(const json& v)          { set(v); }
@@ -205,9 +294,10 @@ public:
     void operator=(uint32_t v)             { set(v); }
     void operator=(int64_t v)              { set(v); }
     void operator=(uint64_t v)             { set(v); }
-    void operator=(double v)               { set(v); }
+    void operator=(float v)                { set(static_cast<json_real_t>(v)); }
+    void operator=(double v)               { set(static_cast<json_real_t>(v)); }
     void operator=(const json_string_t &v) { set(v); }
-    void operator=(const char *v)          { set(json_string_t(v)); }
+    void operator=(const char *v)          { set(v); }
     void operator=(const json_array_t& v)  { set(v); }
     void operator=(const json_object_t& v) { set(v); }
 
@@ -249,39 +339,79 @@ public:
     void add(uint32_t v)             { add(json(v));   }
     void add(uint16_t v)             { add(json(v));   }
     void add(uint8_t v)              { add(json(v));   }
-    void add(double v)               { add(json(v));   }
-    void add(const json_string_t& v) { add(json(v.c_str())); }
-    void add(const char *v)          { add(json(v)); }
+    void add(float v) {
+        add(json(static_cast<json_real_t>(v)));
+    }
+    void add(double v) {
+        add(json(static_cast<json_real_t>(v)));
+    }
+    void add(const json_string_t& v) { add(json(v));   }
+    void add(const char *v)          { add(json(v));   }
     void add(const json_array_t& v)  { add(json(v));   }
     void add(const json_object_t& v) { add(json(v));   }
 
     // JSON object:
     void add(const std::string &key, const json &j);
-    void addUndefined(const std::string &key)                { add(key, undefined); }
-    void addNull(const std::string &key)                     { add(key, null);      }
-    void add(const std::string &key, bool v)                 { add(key, json(v));   }
-    void add(const std::string &key, int64_t v)              { add(key, json(v));   }
-    void add(const std::string &key, int32_t v)              { add(key, json(v));   }
-    void add(const std::string &key, int16_t v)              { add(key, json(v));   }
-    void add(const std::string &key, int8_t v)               { add(key, json(v));   }
-    void add(const std::string &key, uint64_t v)             { add(key, json(v));   }
-    void add(const std::string &key, uint32_t v)             { add(key, json(v));   }
-    void add(const std::string &key, uint16_t v)             { add(key, json(v));   }
-    void add(const std::string &key, uint8_t v)              { add(key, json(v));   }
-    void add(const std::string &key, double v)               { add(key, json(v));   }
-    void add(const std::string &key, const json_string_t& v) { add(key, json(v.c_str()));   }
-    void add(const std::string &key, const char *v)          { add(key, json(v)); }
-    void add(const std::string &key, const json_array_t& v)  { add(key, json(v));   }
-    void add(const std::string &key, const json_object_t& v) { add(key, json(v));   }
+    void addUndefined(const std::string &key) {
+        add(key, undefined);
+    }
+    void addNull(const std::string &key) {
+        add(key, null);
+    }
+    void add(const std::string &key, bool v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, int64_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, int32_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, int16_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, int8_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, uint64_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, uint32_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, uint16_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, uint8_t v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, float v) {
+        add(key, json(static_cast<json_real_t>(v)));
+    }
+    void add(const std::string &key, double v) {
+        add(key, json(static_cast<json_real_t>(v)));
+    }
+    void add(const std::string &key, const json_string_t& v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, const char *v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, const json_array_t& v) {
+        add(key, json(v));
+    }
+    void add(const std::string &key, const json_object_t& v) {
+        add(key, json(v));
+    }
 
     // Subscriptions:
-    const json& at(int i) const;
-    json& at(int i);
-    const json& operator[] (int i) const {
-        return at(i);
+    const json& at(size_t i) const;
+    json& at(size_t i);
+    const json& operator[] (json_index_t i) const {
+        return at(static_cast<size_t>(i));
     }
-    json& operator[] (int i) {
-        return at(i);
+    json& operator[] (json_index_t i) {
+        return at(static_cast<size_t>(i));
     }
     const json& find(const char *key) const;
     json& find(const char *key);
@@ -303,9 +433,9 @@ private:
         UNDEFINED_T,
         NULL_T,
         BOOL_T,
-        SIGNED_INT_T,
-        UNSIGNED_INT_T,
-        DOUBLE_T,
+        SIGNED_T,
+        UNSIGNED_T,
+        REAL_T,
         STRING_T,
         ARRAY_T,
         OBJECT_T
@@ -313,14 +443,14 @@ private:
 
     explicit json(DataType t);
 
-    void copy(const json& v);
-    void copy(bool v);
-    void copy(int64_t v);
-    void copy(uint64_t v);
-    void copy(double v);
-    void copy(const char *v);
-    void copy(const json_array_t& v);
-    void copy(const json_object_t& v);
+    void copyFrom(const json& v);
+    void copyFrom(bool v);
+    void copyFrom(int64_t v);
+    void copyFrom(uint64_t v);
+    void copyFrom(json_real_t v);
+    void copyFrom(const char *v);
+    void copyFrom(const json_array_t& v);
+    void copyFrom(const json_object_t& v);
 
     void parse(scanner &sc);
 
@@ -344,7 +474,7 @@ private:
         bool            bool_value;
         uint64_t        uint_value;
         int64_t         int_value;
-        double          real_value;
+        json_real_t     real_value;
         json_string_t  *string_value;
         json_array_t   *array_value;
         json_object_t  *object_value;

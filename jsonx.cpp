@@ -82,13 +82,13 @@ json::json(json&& rhs)
     case BOOL_T:
         bool_value = rhs.bool_value;
         break;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         int_value = rhs.int_value;
         break;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         uint_value = rhs.uint_value;
         break;
-    case DOUBLE_T:
+    case REAL_T:
         real_value = rhs.real_value;
         break;
     case STRING_T:
@@ -138,9 +138,9 @@ void json::clear()
     case UNDEFINED_T:
     case NULL_T:
     case BOOL_T:
-    case SIGNED_INT_T:
-    case UNSIGNED_INT_T:
-    case DOUBLE_T:
+    case SIGNED_T:
+    case UNSIGNED_T:
+    case REAL_T:
         break;
     case STRING_T:
         delete string_value;
@@ -163,7 +163,7 @@ void json::setNull()
     type = NULL_T;
 }
 
-void json::copy(const json& v)
+void json::copyFrom(const json& v)
 {
     type = v.type;
     switch (type) {
@@ -173,60 +173,60 @@ void json::copy(const json& v)
     case BOOL_T:
         bool_value = v.toBool();
         break;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         int_value = v.toSigned();
         break;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         uint_value = v.toUnsigned();
         break;
-    case DOUBLE_T:
+    case REAL_T:
         real_value = v.toReal();
         break;
     case STRING_T:
-        copy(v.string_value->c_str());
+        copyFrom(v.string_value->c_str());
         break;
     case ARRAY_T:
-        copy(v.toArray());
+        copyFrom(v.toArray());
         break;
     case OBJECT_T:
-        copy(v.toObject());
+        copyFrom(v.toObject());
         break;
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
     } // end switch //
 }
 
-void json::copy(bool v)
+void json::copyFrom(bool v)
 {
     type = BOOL_T;
     bool_value = v;
 }
 
-void json::copy(int64_t v)
+void json::copyFrom(int64_t v)
 {
-    type = SIGNED_INT_T;
+    type = SIGNED_T;
     int_value = v;
 }
 
-void json::copy(uint64_t v)
+void json::copyFrom(uint64_t v)
 {
-    type = UNSIGNED_INT_T;
+    type = UNSIGNED_T;
     uint_value = v;
 }
 
-void json::copy(double v)
+void json::copyFrom(json_real_t v)
 {
-    type = DOUBLE_T;
+    type = REAL_T;
     real_value = v;
 }
 
-void json::copy(const char *v)
+void json::copyFrom(const char *v)
 {
     type = STRING_T;
     string_value = new string(v);
 }
 
-void json::copy(const json_array_t& v)
+void json::copyFrom(const json_array_t& v)
 {
     type = ARRAY_T;
     array_value = new json_array_t();
@@ -235,7 +235,7 @@ void json::copy(const json_array_t& v)
     });
 }
 
-void json::copy(const json_object_t& v)
+void json::copyFrom(const json_object_t& v)
 {
     type = OBJECT_T;
     object_value = new json_object_t();
@@ -260,11 +260,11 @@ bool json::toBool() const
         return false;
     case BOOL_T:
         return bool_value;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         return int_value != 0;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         return uint_value != 0;
-    case DOUBLE_T:
+    case REAL_T:
         return round(real_value) != 0;
     case STRING_T:
         return stoi(*string_value) != 0;
@@ -280,7 +280,7 @@ bool json::toBool() const
 
 int64_t& json::toSignedRef64()
 {
-    if (type != SIGNED_INT_T)
+    if (type != SIGNED_T)
         set(toSigned());
     return int_value;
 }
@@ -309,11 +309,11 @@ int64_t json::toSigned() const
         return 0;
     case BOOL_T:
         return bool_value ? 1 : 0;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         return int_value;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         return uint_value;
-    case DOUBLE_T:
+    case REAL_T:
         return static_cast<int64_t>(round(real_value));
     case STRING_T:
         return stoi(*string_value);
@@ -329,7 +329,7 @@ int64_t json::toSigned() const
 
 uint64_t& json::toUnsignedRef64()
 {
-    if (type != UNSIGNED_INT_T)
+    if (type != UNSIGNED_T)
         set(toUnsigned());
     return uint_value;
 }
@@ -358,14 +358,14 @@ uint64_t json::toUnsigned() const
         return 0;
     case BOOL_T:
         return bool_value ? 1 : 0;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         if (int_value >= 0)
             return int_value;
         else
             return 0;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         return uint_value;
-    case DOUBLE_T:
+    case REAL_T:
         if (real_value > -0.5)
             return static_cast<uint64_t>(round(real_value));
         else
@@ -382,14 +382,14 @@ uint64_t json::toUnsigned() const
     } // end switch //
 }
 
-double& json::toRealRef()
+json_real_t& json::toRealRef()
 {
-    if (type != DOUBLE_T)
+    if (type != REAL_T)
         set(toReal());
     return real_value;
 }
 
-double json::toReal() const
+json_real_t json::toReal() const
 {
     switch (type) {
     case UNDEFINED_T:
@@ -397,19 +397,19 @@ double json::toReal() const
     case NULL_T:
         return 0.0;
     case BOOL_T:
-        return bool_value ? 1.0 : 0.0;
-    case SIGNED_INT_T:
-        return static_cast<double>(int_value);
-    case UNSIGNED_INT_T:
-        return static_cast<double>(uint_value);
-    case DOUBLE_T:
+        return static_cast<json_real_t>(bool_value ? 1.0 : 0.0);
+    case SIGNED_T:
+        return static_cast<json_real_t>(int_value);
+    case UNSIGNED_T:
+        return static_cast<json_real_t>(uint_value);
+    case REAL_T:
         return real_value;
     case STRING_T:
-        return stoi(*string_value);
+        return static_cast<json_real_t>(stoi(*string_value));
     case ARRAY_T:
-        return array_value->size();
+        return static_cast<json_real_t>(array_value->size());
     case OBJECT_T:
-        return object_value->size();
+        return static_cast<json_real_t>(object_value->size());
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
         return 0;
@@ -433,11 +433,11 @@ std::string json::toString()
         return "null";
     case BOOL_T:
         return bool_value ? "true" : "false";
-    case SIGNED_INT_T:
+    case SIGNED_T:
         return to_string(int_value);
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         return to_string(uint_value);
-    case DOUBLE_T:
+    case REAL_T:
         return to_string(real_value);
     case STRING_T:
         return *string_value;
@@ -485,13 +485,13 @@ json_array_t json::toArray()
     case BOOL_T:
         j.push_back(json(bool_value ? "true" : "false"));
         break;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         j.push_back(json(int_value));
         break;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         j.push_back(json(uint_value));
         break;
-    case DOUBLE_T:
+    case REAL_T:
         j.push_back(json(real_value));
         break;
     case STRING_T:
@@ -551,13 +551,13 @@ json_object_t json::toObject()
     case BOOL_T:
         m.emplace("0", json(bool_value ? "true" : "false"));
         break;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         m.emplace("0", json(int_value));
         break;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         m.emplace("0", json(uint_value));
         break;
-    case DOUBLE_T:
+    case REAL_T:
         m.emplace("0", json(real_value));
         break;
     case STRING_T:
@@ -597,22 +597,22 @@ const json_object_t& json::toObjectRef() const
     return *object_value;
 }
 
-json& json::at(int i)
+json& json::at(size_t i)
 {
     if (type != ARRAY_T) {
         set(toArray());
-        for (int j = 0; j < i; ++j)
+        for (size_t j = 0; j < i; ++j)
             (*array_value)[j].setUndefined();
     } else {
-        while(static_cast<size_t>(i) >= array_value->size())
+        while(i >= array_value->size())
             array_value->push_back(undefined);
     }
     return (*array_value)[i];
 }
 
-const json& json::at(int i) const
+const json& json::at(size_t i) const
 {
-    if ((type != ARRAY_T) || (i >= static_cast<int>(size())))
+    if ((type != ARRAY_T) || (i >= size()))
         return undefined;
     return (*array_value)[i];
 }
@@ -676,11 +676,11 @@ bool json::operator==(const json &v) const
         return true;
     case BOOL_T:
         return (bool_value == v.bool_value);
-    case SIGNED_INT_T:
+    case SIGNED_T:
         return (int_value == v.int_value);
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         return (uint_value == v.uint_value);
-    case DOUBLE_T:
+    case REAL_T:
         return (real_value == v.real_value);
     case STRING_T:
         return (*string_value == *v.string_value);

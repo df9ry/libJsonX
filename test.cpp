@@ -281,28 +281,28 @@ int main(int, const char *[])
             x.parse("12345678");
             assert(x.isNumber());
             assert(x.isUnsigned());
-            assert(x.toInteger() == 12345678);
+            assert(x.toInt() == 12345678);
             assert(x.toUnsigned() == 12345678);
             assert(x.toReal() == 12345678);
 
             x.parse("+87654321");
             assert(x.isNumber());
             assert(x.isSigned());
-            assert(x.toInteger() == 87654321);
+            assert(x.toInt() == 87654321);
             assert(x.toSigned() == 87654321);
             assert(x.toReal() == 87654321);
 
             x.parse("-87654321");
             assert(x.isNumber());
             assert(x.isSigned());
-            assert(x.toInteger() == -87654321);
+            assert(x.toInt() == -87654321);
             assert(x.toSigned() == -87654321);
             assert(x.toReal() == -87654321);
 
             x.parse("5.71");
             assert(x.isNumber());
             assert(x.isReal());
-            assert(x.toInteger() == 6);
+            assert(x.toInt() == 6);
             assert(x.toUnsigned() == 6);
             assert(x.toSigned() == 6);
             assert(x.toReal() == 5.71);
@@ -310,7 +310,7 @@ int main(int, const char *[])
             x.parse("-11e3");
             assert(x.isNumber());
             assert(x.isReal());
-            assert(x.toInteger() == -11000);
+            assert(x.toInt() == -11000);
             assert(x.toUnsigned() == 0);
             assert(x.toSigned() == -11000);
             assert(x.toReal() == -11e3);
@@ -335,13 +335,13 @@ int main(int, const char *[])
             assert(x.size() == 5);
             assert(x[0].isNull());
             assert(x[1].isNull());
-            assert(x[2].isInteger());
+            assert(x[2].isInt());
             assert(x[3].isNull());
             assert(x[4].isString());
             assert(!x[5].isDefined());
 
             //cout << "<" << x[2] << ">" << endl;
-            assert(x[2].toInteger() == 1);
+            assert(x[2].toInt() == 1);
             assert(x[4].toString() == "Bla");
 
             int i1 = x[2];

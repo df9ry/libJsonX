@@ -71,13 +71,13 @@ void json::write(std::ostream &os) const
     case BOOL_T:
         os << (bool_value ? "true" : "false");
         break;
-    case SIGNED_INT_T:
+    case SIGNED_T:
         os << int_value;
         break;
-    case UNSIGNED_INT_T:
+    case UNSIGNED_T:
         os << uint_value;
         break;
-    case DOUBLE_T:
+    case REAL_T:
         os << real_value;
         break;
     case STRING_T:
@@ -224,18 +224,18 @@ void json::parse(jsonx::scanner &sc)
                 return;
             }
             if (regex_match(s, UINT_EXPR)) {
-                type = UNSIGNED_INT_T;
+                type = UNSIGNED_T;
                 uint_value = std::stoull(s);
                 return;
             }
             if (regex_match(s, SINT_EXPR)) {
-                type = SIGNED_INT_T;
+                type = SIGNED_T;
                 uint_value = std::stoll(s);
                 return;
             }
             if (regex_match(s, REAL_EXPR)) {
-                type = DOUBLE_T;
-                real_value = std::stod(s);
+                type = REAL_T;
+                real_value = static_cast<json_real_t>(std::stod(s));
                 return;
             }
             throw runtime_error(string("Unexpected token: \"" + s + "\""));
