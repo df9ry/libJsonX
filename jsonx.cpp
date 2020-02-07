@@ -416,7 +416,7 @@ double json::toReal() const
     } // end switch //
 }
 
-const std::string json::toString() const
+std::string json::toString() const
 {
     if (type == STRING_T)
         return *string_value;
@@ -523,6 +523,14 @@ json_array_t& json::toArrayRef()
     return *array_value;
 }
 
+const json_array_t& json::toArrayRef() const
+{
+    if (type != ARRAY_T) {
+        throw runtime_error("Not an array");
+    }
+    return *array_value;
+}
+
 const json_object_t& json::toObject() const
 {
     if (type == OBJECT_T)
@@ -581,6 +589,14 @@ json_object_t& json::toObjectRef()
     return *object_value;
 }
 
+const json_object_t& json::toObjectRef() const
+{
+    if (type == OBJECT_T) {
+        throw runtime_error("Not an object");
+    }
+    return *object_value;
+}
+
 json& json::at(int i)
 {
     if (type != ARRAY_T) {
@@ -591,6 +607,13 @@ json& json::at(int i)
         while(static_cast<size_t>(i) >= array_value->size())
             array_value->push_back(undefined);
     }
+    return (*array_value)[i];
+}
+
+const json& json::at(int i) const
+{
+    if ((type != ARRAY_T) || (i >= static_cast<int>(size())))
+        return undefined;
     return (*array_value)[i];
 }
 
@@ -605,6 +628,16 @@ json& json::find(const char *key)
     }
     if (iter == object_value->end())
         iter = object_value->emplace(key, undefined).first;
+    return iter->second;
+}
+
+const json& json::find(const char *key) const
+{
+    if (type != OBJECT_T)
+        return undefined;
+    json_object_t::const_iterator iter = object_value->find(key);
+    if (iter == object_value->end())
+        return undefined;
     return iter->second;
 }
 
@@ -655,33 +688,6 @@ bool json::operator==(const json &v) const
         return operator==(*v.array_value);
     case OBJECT_T:
         return operator==(*v.object_value);
-    default:
-        cerr << "jsonx::json: Invalid data type " << type << endl;
-        return false;
-    } // end switch //
-}
-
-bool json::operator<(const json &v) const
-{
-    if (type != v.type)
-        return false;
-    switch (type) {
-    case UNDEFINED_T:
-        return false; // Undefined is never less than anything!
-    case NULL_T:
-        return false;
-    case BOOL_T:
-        return (bool_value < v.bool_value);
-    case SIGNED_INT_T:
-        return (int_value < v.int_value);
-    case UNSIGNED_INT_T:
-        return (uint_value < v.uint_value);
-    case DOUBLE_T:
-        return (real_value < v.real_value);
-    case STRING_T:
-    case ARRAY_T:
-    case OBJECT_T:
-        return (size() < v.size());
     default:
         cerr << "jsonx::json: Invalid data type " << type << endl;
         return false;

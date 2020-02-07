@@ -10,6 +10,34 @@
 using namespace std;
 using namespace jsonx;
 
+static bool string_arg_val(string s)
+{
+    return (s == "Test");
+}
+
+
+static bool string_arg_const_val(const string s)
+{
+    return (s == "Test");
+}
+
+
+static bool string_arg_ref(string& s)
+{
+    return (s == "Test");
+}
+
+
+static bool string_arg_const_ref(string s)
+{
+    return (s == "Test");
+}
+
+static bool string_arg_const_ptr(const char *s)
+{
+    return (string(s) == "Test");
+}
+
 int main(int, const char *[])
 {
     cout << "JsonX Test START" << endl;
@@ -113,6 +141,7 @@ int main(int, const char *[])
         cout << "Testing right assignments:" << endl;
         {
             json x;
+
             x.setUndefined();
             assert(!x.isDefined());
             assert(x.write() == "");
@@ -142,6 +171,22 @@ int main(int, const char *[])
             x = "AB\"CD\\EF : \"";
             assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
 
+            string s1 = "AB\"CD\\EF : \"";
+            x = s1;
+            assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
+
+            const string s2 = s1;
+            x = s2;
+            assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
+
+            string& s3 = s1;
+            x = s3;
+            assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
+
+            const string& s4 = s1;
+            x = s4;
+            assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
+
             x = {
                 false,
                 1,
@@ -162,29 +207,58 @@ int main(int, const char *[])
             json x;
 
             x = true;
+            const json x1{x};
             bool b = x;
+            assert(b);
+            b = x1;
             assert(b);
 
             x = false;
+            const json x2{x};
             b = x;
+            assert(!b);
+            b = x2;
             assert(!b);
 
             x = 1024;
+            const json x3{x};
             int i = x;
+            assert(i = 1024);
+            i = x3;
             assert(i = 1024);
 
             x = -1024;
+            const json x4{x};
             i = x;
+            assert(i == -1024);
+            i = x4;
             assert(i == -1024);
 
             x = 11.31;
+            const json x5{x};
             double d = x;
+            assert(d == 11.31);
+            d = x5;
             assert(d == 11.31);
 
             x = "AB\"CD\\EF : \"";
-            assert(x == "AB\"CD\\EF : \"");
-            string s = x;
-            assert(s == "AB\"CD\\EF : \"");
+            const json x6{x};
+            assert(x  == "AB\"CD\\EF : \"");
+            assert(x6 == "AB\"CD\\EF : \"");
+            string s1 = x;
+            assert(s1 == "AB\"CD\\EF : \"");
+            s1 = x6;
+            assert(s1 == "AB\"CD\\EF : \"");
+
+            x = 11;
+            json x7 = x;
+            assert(x7 == 11);
+            i = x7;
+            assert(i == 11);
+            const json x8 = x;
+            assert(x8 == 11);
+            i = x8;
+            assert(i == 11);
         }
         cout << "OK" << endl;
         cout << endl;
@@ -302,10 +376,6 @@ int main(int, const char *[])
             //cout << x.write() << endl;
             assert(x[8].isArray());
             assert(x.size() == 9);
-
-            x[0] = 10.1;
-            x[1] = 20.2;
-            assert(x[0] < x[1]);
         }
         cout << "OK" << endl;
         cout << endl;
@@ -328,6 +398,16 @@ int main(int, const char *[])
             assert(x["Papa"] == "Josef");
             string s2 = x["Papa"];
             assert(s2 == "Josef");
+            const json cx{x};
+            string s = cx["Papa"];
+            assert(s == "Josef");
+            string st;
+            st = cx["Papa"];
+            assert(st == "Josef");
+            json& rx = x;
+            s = rx["Papa"];
+            assert(st == "Josef");
+
             x["Jahr"] = 2020;
             int j = x["Jahr"];
             assert(j == 2020);
@@ -341,6 +421,56 @@ int main(int, const char *[])
         }
         cout << "OK" << endl;
         cout << endl;
+
+        cout << "Testing string arguments:" << endl;
+        {
+            json x("Test");
+            assert(string_arg_val(x));
+            assert(string_arg_const_val(x));
+            assert(string_arg_ref(x));
+            assert(string_arg_const_ref(x));
+            assert(string_arg_const_ptr(x.c_str()));
+
+            const json cx(x);
+            assert(string_arg_val(cx));
+            assert(string_arg_const_val(cx));
+            assert(string_arg_ref(json(cx)));
+            assert(string_arg_const_ref(cx));
+            assert(string_arg_const_ptr(cx.c_str()));
+
+            json rg;
+            rg.add("Test");
+            assert(string_arg_val(rg[0]));
+            assert(string_arg_const_val(rg[0]));
+            assert(string_arg_ref(rg[0]));
+            assert(string_arg_const_ref(rg[0]));
+            assert(string_arg_const_ptr(rg[0].c_str()));
+
+            const json crg(rg);
+            assert(string_arg_val(crg[0]));
+            assert(string_arg_const_val(crg[0]));
+            assert(string_arg_ref(json(crg[0])));
+            assert(string_arg_const_ref(crg[0]));
+            assert(string_arg_const_ptr(crg[0].c_str()));
+
+            json obj;
+            obj["A"] = "Test";
+            assert(string_arg_val(obj["A"]));
+            assert(string_arg_const_val(obj["A"]));
+            assert(string_arg_ref(obj["A"]));
+            assert(string_arg_const_ref(obj["A"]));
+            assert(string_arg_const_ptr(obj["A"].c_str()));
+
+            const json cobj(obj);
+            assert(string_arg_val(cobj["A"]));
+            assert(string_arg_const_val(cobj["A"]));
+            assert(string_arg_ref(json(cobj["A"])));
+            assert(string_arg_const_ref(cobj["A"]));
+            assert(string_arg_const_ptr(cobj["A"].c_str()));
+        }
+        cout << "OK" << endl;
+        cout << endl;
+
 
         cout << "JsonX Test FINISHED" << endl;
         return EXIT_SUCCESS;

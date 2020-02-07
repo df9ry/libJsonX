@@ -91,16 +91,21 @@ public:
     double               toNumber() {
         return toReal();
     }
-    const json_string_t  toString() const;
+          json_string_t  toString() const;
           json_string_t  toString();
     const json_string_t& toStringRef() const;
           json_string_t& toStringRef();
     const json_array_t&  toArray() const;
           json_array_t   toArray();
+    const json_array_t&  toArrayRef() const;
           json_array_t&  toArrayRef();
     const json_object_t& toObject() const;
           json_object_t  toObject();
+    const json_object_t& toObjectRef() const;
           json_object_t& toObjectRef();
+    const char *c_str() const {
+          return toStringRef().c_str();
+    }
 
     // Automatic type conversations:
     operator bool() const {
@@ -163,14 +168,11 @@ public:
     operator double&() {
         return toRealRef();
     }
-    operator const json_string_t() const {
-        return toString();
+    operator const json_string_t&() const {
+        return toStringRef();
     }
     operator json_string_t&() {
         return toStringRef();
-    }
-    operator const char*() {
-        return toStringRef().c_str();
     }
 
     // JSON value:
@@ -193,7 +195,7 @@ public:
     void set(const json_object_t& v) { clear(); copy(v); }
 
     // Assignments:
-    void operator=(json& v)                { set(v); }
+    void operator=(const json& v)          { set(v); }
     void operator=(bool v)                 { set(v); }
     void operator=(int8_t v)               { set(v); }
     void operator=(uint8_t v)              { set(v); }
@@ -210,13 +212,27 @@ public:
     void operator=(const json_object_t& v) { set(v); }
 
     // Compares:
-    bool operator==(const char *v) const { return operator==(json(v)); }
     bool operator==(const json &v) const;
+    bool operator==(const char *v) const { return operator==(json(v)); }
     bool operator!=(const json &v) const { return !operator==(v); }
-    bool operator<(const json &v) const;
-    bool operator<=(const json &v) const { return operator<(v) || operator==(v); }
-    bool operator>(const json &v) const { return !operator<=(v); }
-    bool operator>=(const json &v) const { return !operator<(v); }
+    bool operator==(bool v)        const { return toBool()     == v; }
+    bool operator==(int64_t v)     const { return toSigned()   == v; }
+    bool operator==(uint64_t v)    const { return toUnsigned() == v; }
+    bool operator==(int32_t v)     const { return toSigned()   == v; }
+    bool operator==(uint32_t v)    const { return toUnsigned() == v; }
+    bool operator==(int16_t v)     const { return toSigned()   == v; }
+    bool operator==(uint16_t v)    const { return toUnsigned() == v; }
+    bool operator==(int8_t v)      const { return toSigned()   == v; }
+    bool operator==(uint8_t v)     const { return toUnsigned() == v; }
+    bool operator!=(bool v)        const { return toBool()     != v; }
+    bool operator!=(int64_t v)     const { return toSigned()   != v; }
+    bool operator!=(uint64_t v)    const { return toUnsigned() != v; }
+    bool operator!=(int32_t v)     const { return toSigned()   != v; }
+    bool operator!=(uint32_t v)    const { return toUnsigned() != v; }
+    bool operator!=(int16_t v)     const { return toSigned()   != v; }
+    bool operator!=(uint16_t v)    const { return toUnsigned() != v; }
+    bool operator!=(int8_t v)      const { return toSigned()   != v; }
+    bool operator!=(uint8_t v)     const { return toUnsigned() != v; }
     bool operator==(const json_array_t &v) const;
     bool operator==(const json_object_t &v) const;
 
@@ -226,7 +242,13 @@ public:
     void addNull()                   { add(null);      }
     void add(bool v)                 { add(json(v));   }
     void add(int64_t v)              { add(json(v));   }
+    void add(int32_t v)              { add(json(v));   }
+    void add(int16_t v)              { add(json(v));   }
+    void add(int8_t v)               { add(json(v));   }
     void add(uint64_t v)             { add(json(v));   }
+    void add(uint32_t v)             { add(json(v));   }
+    void add(uint16_t v)             { add(json(v));   }
+    void add(uint8_t v)              { add(json(v));   }
     void add(double v)               { add(json(v));   }
     void add(const json_string_t& v) { add(json(v.c_str())); }
     void add(const char *v)          { add(json(v)); }
@@ -239,7 +261,13 @@ public:
     void addNull(const std::string &key)                     { add(key, null);      }
     void add(const std::string &key, bool v)                 { add(key, json(v));   }
     void add(const std::string &key, int64_t v)              { add(key, json(v));   }
+    void add(const std::string &key, int32_t v)              { add(key, json(v));   }
+    void add(const std::string &key, int16_t v)              { add(key, json(v));   }
+    void add(const std::string &key, int8_t v)               { add(key, json(v));   }
     void add(const std::string &key, uint64_t v)             { add(key, json(v));   }
+    void add(const std::string &key, uint32_t v)             { add(key, json(v));   }
+    void add(const std::string &key, uint16_t v)             { add(key, json(v));   }
+    void add(const std::string &key, uint8_t v)              { add(key, json(v));   }
     void add(const std::string &key, double v)               { add(key, json(v));   }
     void add(const std::string &key, const json_string_t& v) { add(key, json(v.c_str()));   }
     void add(const std::string &key, const char *v)          { add(key, json(v)); }
@@ -247,11 +275,28 @@ public:
     void add(const std::string &key, const json_object_t& v) { add(key, json(v));   }
 
     // Subscriptions:
+    const json& at(int i) const;
     json& at(int i);
-    json& operator[] (int i)                  { return at(i);             }
+    const json& operator[] (int i) const {
+        return at(i);
+    }
+    json& operator[] (int i) {
+        return at(i);
+    }
+    const json& find(const char *key) const;
     json& find(const char *key);
-    json& operator[] (const char *key)        { return find(key);         }
-    json& operator[] (const std::string& key) { return find(key.c_str()); }
+    const json& operator[] (const char *key) const {
+        return find(key);
+    }
+    json& operator[] (const char *key) {
+        return find(key);
+    }
+    const json& operator[] (const std::string& key) const {
+        return find(key.c_str());
+    }
+    json& operator[] (const std::string& key) {
+        return find(key.c_str());
+    }
 
 private:
     typedef enum {
