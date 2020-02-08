@@ -71,3 +71,14 @@ Thumbs.db
 *.dll
 *.exe
 
+# Doxygen generated files
+# -----------------------
+doc/
+
+# CMake build dir
+# ---------------
+build/
+
+# Visual studio code
+# ------------------
+.vscode/

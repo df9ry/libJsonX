@@ -10,6 +10,7 @@ CONFIG(debug, debug|release) {
 
 DISTFILES += \
     COPYING \
+    Doxyfile \
     README \
     agpl-3.0.html \
     agpl-3.0.txt \

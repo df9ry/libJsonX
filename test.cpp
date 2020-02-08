@@ -247,7 +247,7 @@ int main(int, const char *[])
             assert(x6 == "AB\"CD\\EF : \"");
             string s1 = x;
             assert(s1 == "AB\"CD\\EF : \"");
-            s1 = x6;
+            s1 = x6.toString(); /// Investigate: Why do we need this here?
             assert(s1 == "AB\"CD\\EF : \"");
 
             x = 11;
@@ -402,10 +402,10 @@ int main(int, const char *[])
             string s = cx["Papa"];
             assert(s == "Josef");
             string st;
-            st = cx["Papa"];
+            st = cx["Papa"].toString(); /// Investigate: Why do we need this here?
             assert(st == "Josef");
             json& rx = x;
-            s = rx["Papa"];
+            s = rx["Papa"].toString(); /// Investigate: Why do we need this here?
             assert(st == "Josef");
 
             x["Jahr"] = 2020;
