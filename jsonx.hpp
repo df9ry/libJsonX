@@ -8,19 +8,47 @@
 #include <sstream>
 #include <stdint.h>
 
+/**
+ * @brief Namespace for JsonX.
+ *        Insert "using namespace jsonx" into your source code to automatically resolve names.
+ */
 namespace jsonx {
 
 class scanner;
 
 class json;
 
-typedef std::string                        json_string_t;
-typedef std::vector<json>                  json_array_t;
-typedef std::map<const std::string, json>  json_object_t;
+/**
+ * @brief Using std::string for string values.
+ */
+typedef std::string json_string_t;
+/**
+ * @brief Using std::vector for json arrays.
+ */
+typedef std::vector<json> json_array_t;
+/**
+ * @brief Using std::map for json objects.
+ */
+typedef std::map<const std::string, json> json_object_t;
+/**
+ * @brief Using std::pair for items in json objects.
+ */
 typedef std::pair<const std::string, json> json_object_value_t;
-typedef int                                json_index_t;
+/**
+ * @brief Using int as index values in [] expressions.
+ *        Note: Using size_t breaks todays compilers for lots of ambiguities.
+ */
+typedef int json_index_t;
+/**
+ * @brief Using double for real values.
+ *        Note: Using long double breaks todas compilers.
+ */
 typedef double                             json_real_t;
 
+/**
+ * @brief Main json class.
+ *        Simply use "json" as type for every json node in your program.
+ */
 class json {
 public:
     // Constructors:
