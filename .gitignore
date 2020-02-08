@@ -82,3 +82,10 @@ build/
 # Visual studio code
 # ------------------
 .vscode/
+
+# Eclipse
+# -------
+.cproject
+.project
+.settings
+
