@@ -192,6 +192,7 @@ void json::parse(jsonx::scanner &sc)
                     sc.skip_whitespace();
                 }
             } // end while //
+            sc.get_ch();
         }
         break;
     case '"':
