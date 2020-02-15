@@ -79,6 +79,7 @@ doc/
 # CMake build dir
 # ---------------
 build/
+build-release/
 
 # Visual studio code
 # ------------------
