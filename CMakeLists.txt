@@ -1,21 +1,27 @@
 cmake_minimum_required(VERSION 3.9)
 project(JsonX VERSION 0.2.0 DESCRIPTION "JsonX library")
 
+include(CTest)
+enable_testing()
+
+set (SOURCES
+    jsonx.cpp
+    io.cpp)
+set (HEADERS
+    jsonx.hpp
+    io.hpp
+    scanner.hpp)
+
+add_library(JsonX STATIC ${SOURCES} ${HEADERS})
+target_compile_features(JsonX PUBLIC cxx_std_17)
+set_target_properties(JsonX PROPERTIES
+    PUBLIC_HEADER jsonx.hpp)
+
 if (WIN32)
     set(CMAKE_INSTALL_PREFIX "C:/local/${CMAKE_BUILD_TYPE}/")
 else()
     set(CMAKE_INSTALL_PREFIX "/usr/local/${CMAKE_BUILD_TYPE}/")
 endif()
-
-include(CTest)
-enable_testing()
-
-add_library(JsonX STATIC
-    jsonx.cpp
-    io.cpp)
-target_compile_features(JsonX PUBLIC cxx_std_17)
-set_target_properties(JsonX PROPERTIES PUBLIC_HEADER
-    jsonx.hpp)
 install(TARGETS JsonX
     LIBRARY       DESTINATION "lib"
     ARCHIVE       DESTINATION "lib"
