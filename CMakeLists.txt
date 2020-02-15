@@ -19,11 +19,12 @@ set_target_properties(JsonX PROPERTIES PUBLIC_HEADER
     jsonx.hpp)
 install(TARGETS JsonX
     LIBRARY       DESTINATION "lib"
+    ARCHIVE       DESTINATION "lib"
     PUBLIC_HEADER DESTINATION "include")
 
 set(APP_EXE JsonX_Test)
 add_executable(${APP_EXE} test.cpp)
 target_compile_features(JsonX_Test PUBLIC cxx_std_14)
-target_link_libraries(${APP_EXE} JsonX)
+target_link_libraries(${APP_EXE} JsonX stdc++ m)
 
 add_test(Test ${APP_EXE})
