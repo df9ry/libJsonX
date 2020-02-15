@@ -13,7 +13,7 @@ enable_testing()
 add_library(JsonX STATIC
     jsonx.cpp
     io.cpp)
-target_compile_features(JsonX PUBLIC cxx_std_14)
+target_compile_features(JsonX PUBLIC cxx_std_17)
 set_target_properties(JsonX PROPERTIES PUBLIC_HEADER
     jsonx.hpp)
 install(TARGETS JsonX
@@ -23,7 +23,7 @@ install(TARGETS JsonX
 
 set(APP_EXE JsonX_Test)
 add_executable(${APP_EXE} test.cpp)
-target_compile_features(${APP_EXE} PUBLIC cxx_std_14)
+target_compile_features(${APP_EXE} PUBLIC cxx_std_17)
 target_link_libraries(${APP_EXE} JsonX stdc++ m)
 
 add_test(Test ${APP_EXE})
