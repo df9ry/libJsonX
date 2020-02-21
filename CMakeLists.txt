@@ -30,6 +30,10 @@ install(TARGETS JsonX
 set(APP_EXE JsonX_Test)
 add_executable(${APP_EXE} test.cpp)
 target_compile_features(${APP_EXE} PUBLIC cxx_std_17)
-target_link_libraries(${APP_EXE} JsonX stdc++ m)
+if (WIN32)
+    target_link_libraries(${APP_EXE} JsonX)
+else()
+    target_link_libraries(${APP_EXE} JsonX stdc++ m)
+endif()
 
 add_test(Test ${APP_EXE})
