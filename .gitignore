@@ -80,6 +80,7 @@ doc/
 # ---------------
 build/
 build-release/
+build-cb/
 
 # Visual studio code
 # ------------------
