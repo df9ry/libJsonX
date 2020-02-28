@@ -17,11 +17,6 @@ target_compile_features(JsonX PUBLIC cxx_std_17)
 set_target_properties(JsonX PROPERTIES
     PUBLIC_HEADER jsonx.hpp)
 
-if (WIN32)
-    set(CMAKE_INSTALL_PREFIX "C:/local/${CMAKE_BUILD_TYPE}/")
-else()
-    set(CMAKE_INSTALL_PREFIX "/usr/local/${CMAKE_BUILD_TYPE}/")
-endif()
 install(TARGETS JsonX
     LIBRARY       DESTINATION "lib"
     ARCHIVE       DESTINATION "lib"
