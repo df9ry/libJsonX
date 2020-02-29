@@ -18,9 +18,9 @@ set_target_properties(JsonX PROPERTIES
     PUBLIC_HEADER jsonx.hpp)
 
 install(TARGETS JsonX
-    LIBRARY       DESTINATION "lib"
-    ARCHIVE       DESTINATION "lib"
-    PUBLIC_HEADER DESTINATION "include")
+    LIBRARY       DESTINATION "${CMAKE_BUILD_TYPE}/lib"
+    ARCHIVE       DESTINATION "${CMAKE_BUILD_TYPE}/lib"
+    PUBLIC_HEADER DESTINATION "${CMAKE_BUILD_TYPE}/include")
 
 set(APP_EXE JsonX_Test)
 add_executable(${APP_EXE} test.cpp)
