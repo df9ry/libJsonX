@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(JsonX VERSION 0.2.0 DESCRIPTION "JsonX library")
+project(JsonX VERSION 0.2.1 DESCRIPTION "JsonX library")
 
 include(CTest)
 enable_testing()

@@ -33,8 +33,18 @@ public:
 
     void skip_whitespace()
     {
-        while (std::isspace(static_cast<unsigned char>(cur_ch)) && !eof())
+        while (!eof()) {
+            if (in_comment) {
+                if (cur_ch == '\n')
+                    in_comment = false;
+            } else if (!std::isspace(static_cast<unsigned char>(cur_ch))) {
+                if (cur_ch == '#')
+                    in_comment = true;
+                else
+                    return;
+            }
             get_ch();
+        } // end while //
     }
 
     int cur_ch{0x00};
@@ -43,6 +53,7 @@ public:
 
 private:
     std::istream &is;
+    bool in_comment{false};
 };
 
 } // end namespace jsonx //
