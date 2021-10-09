@@ -51,8 +51,21 @@ typedef double                             json_real_t;
  */
 class json {
 public:
+    typedef enum {
+        UNDEFINED_T,
+        NULL_T,
+        BOOL_T,
+        SIGNED_T,
+        UNSIGNED_T,
+        REAL_T,
+        STRING_T,
+        ARRAY_T,
+        OBJECT_T
+    } DataType;
+
     // Constructors:
     json() {}
+    json(DataType t);
     json(const json& rhs): json() { copyFrom(rhs); }
     json(json&& rhs);
     json(const json_array_t& rhs): json() { copyFrom(rhs); }
@@ -457,20 +470,6 @@ public:
     }
 
 private:
-    typedef enum {
-        UNDEFINED_T,
-        NULL_T,
-        BOOL_T,
-        SIGNED_T,
-        UNSIGNED_T,
-        REAL_T,
-        STRING_T,
-        ARRAY_T,
-        OBJECT_T
-    } DataType;
-
-    explicit json(DataType t);
-
     void copyFrom(const json& v);
     void copyFrom(bool v);
     void copyFrom(int64_t v);

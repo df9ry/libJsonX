@@ -10,26 +10,9 @@
 using namespace std;
 
 namespace jsonx {
-
-class json_const {
-public:
-    static const json _undefined;
-    static const json _null;
-    static const json _array;
-    static const json _object;
-
-private:
-    json_const();
-};
-
-const json json_const::_undefined{json(json::UNDEFINED_T)};
-const json json_const::_null{json(json::NULL_T)};
-const json json_const::_array{json(json::ARRAY_T)};
-const json json_const::_object{json(json::OBJECT_T)};
-
-const json           json::undefined(json_const::_undefined);
-const json           json::null(json_const::_null);
-const string         empty_string{""};
+    
+const json           json::undefined{};
+const string         empty_string{};
 const json_array_t   empty_array{};
 const json_object_t  empty_object{};
 
