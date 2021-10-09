@@ -5,7 +5,6 @@
 #include <cstring>
 #include <cmath>
 #include <sstream>
-#include <assert.h>
 
 using namespace std;
 
@@ -15,7 +14,7 @@ const json           json::undefined(json::UNDEFINED_T);
 const json           json::null(json::NULL_T);
 const json_array_t   json::empty_array{};
 const json_object_t  json::empty_object{};
-const std::string    json::empty_string{""};
+const std::string    json::empty_string{};
 
 json jarray(initializer_list<json> args)
 {
