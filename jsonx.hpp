@@ -63,6 +63,13 @@ public:
         OBJECT_T
     } DataType;
 
+    // Constants:
+    static const json           undefined;
+    static const json           null;
+    static const json_array_t   empty_array;
+    static const json_object_t  empty_object;
+    static const std::string    empty_string;
+
     // Constructors:
     json() {}
     json(DataType t);
@@ -138,10 +145,6 @@ public:
     bool isObject() const {
         return type == OBJECT_T;
     }
-
-    // Constants:
-    static const json undefined;
-    static const json null;
 
     // Type conversions:
     bool toBool() const;

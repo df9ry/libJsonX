@@ -10,15 +10,16 @@
 using namespace std;
 
 namespace jsonx {
-    
-const json           json::undefined{};
-const string         empty_string{};
-const json_array_t   empty_array{};
-const json_object_t  empty_object{};
+
+const json           json::undefined(json::UNDEFINED_T);
+const json           json::null(json::NULL_T);
+const json_array_t   json::empty_array{};
+const json_object_t  json::empty_object{};
+const std::string    json::empty_string{""};
 
 json jarray(initializer_list<json> args)
 {
-    json rg(empty_array);
+    json rg(json::empty_array);
     for_each(args.begin(), args.end(), [&rg](const json& j) {
         rg.add(j);
     });
@@ -27,7 +28,7 @@ json jarray(initializer_list<json> args)
 
 json jobject(initializer_list<json_object_value_t> args)
 {
-    json obj(empty_object);
+    json obj(json::empty_object);
     for_each(args.begin(), args.end(), [&obj](const json_object_value_t& v) {
         obj.add(v.first, v.second);
     });
