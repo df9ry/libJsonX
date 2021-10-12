@@ -472,6 +472,10 @@ public:
         return find(key.c_str());
     }
 
+    DataType getType() const {
+        return type;
+    }
+
 private:
     void copyFrom(const json& v);
     void copyFrom(bool v);
