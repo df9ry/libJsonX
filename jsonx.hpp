@@ -52,15 +52,15 @@ typedef double                             json_real_t;
 class json {
 public:
     typedef enum {
-        UNDEFINED_T,
-        NULL_T,
-        BOOL_T,
-        SIGNED_T,
-        UNSIGNED_T,
-        REAL_T,
-        STRING_T,
-        ARRAY_T,
-        OBJECT_T
+        /*0*/ UNDEFINED_T,
+        /*1*/ NULL_T,
+        /*2*/ BOOL_T,
+        /*3*/ SIGNED_T,
+        /*4*/ UNSIGNED_T,
+        /*5*/ REAL_T,
+        /*6*/ STRING_T,
+        /*7*/ ARRAY_T,
+        /*8*/ OBJECT_T
     } DataType;
 
     // Constants:
