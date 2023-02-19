@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 project(JsonX VERSION 0.2.1 DESCRIPTION "JsonX library")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Required for linux shared objects
+
 include(CTest)
 enable_testing()
 
