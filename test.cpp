@@ -120,8 +120,10 @@ int main(int, const char *[])
             x.set(11.31);
             assert(x.write() == "11.31");
 
-            x.set("AB\"CD\\EF : \"");
-            assert(x.write() == "\"AB\\\"CD\\\\EF : \\\"\"");
+            x.set("\""   "\\"  "\b"  "\f"  "\n"  "\r"  "\t");
+            cout << x.write() << endl;
+            assert(x.write() ==
+              "\"\\\"" "\\\\" "\\b" "\\f" "\\n" "\\r" "\\t\"");
 
             x.set(json({
                 false,

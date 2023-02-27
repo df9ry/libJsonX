@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(JsonX VERSION 0.2.1 DESCRIPTION "JsonX library")
+project(JsonX VERSION 0.2.3 DESCRIPTION "JsonX library")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Required for linux shared objects
 
@@ -28,7 +28,7 @@ set(APP_EXE JsonX_Test)
 add_executable(${APP_EXE} test.cpp)
 target_compile_features(${APP_EXE} PUBLIC cxx_std_17)
 if (WIN32)
-    target_link_libraries(${APP_EXE} JsonX)
+    target_link_libraries(${APP_EXE} JsonX stdc++)
 else()
     target_link_libraries(${APP_EXE} JsonX stdc++ m)
 endif()

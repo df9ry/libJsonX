@@ -23,9 +23,35 @@ namespace jsonx {
 void serialize(ostream &ss, const string &v) {
     ss << "\"";
     for_each(v.begin(), v.end(), [&ss](const char ch) {
-        if (ch == '\\' || ch == '"')
-            ss << "\\";
-        ss << ch;
+        switch (ch) {
+        case '\0':
+            ss << "\\0";
+            break;
+        case '\"':
+            ss << "\\\"";
+            break;
+        case '\\':
+            ss << "\\\\";
+            break;
+        case '\b':
+            ss << "\\b";
+            break;
+        case '\f':
+            ss << "\\f";
+            break;
+        case '\n':
+            ss << "\\n";
+            break;
+        case '\r':
+            ss << "\\r";
+            break;
+        case '\t':
+            ss << "\\t";
+            break;
+        default:
+            ss << ch;
+            break;
+        } // end switch //
     });
     ss << "\"";
 }
@@ -94,6 +120,11 @@ void json::write(std::ostream &os) const
     } // end switch //}
 }
 
+static inline std::string chartostring(char c)
+{
+    return string(&c, 1);
+}
+
 static void parse_string(jsonx::scanner &sc, std::string &s)
 {
     sc.skip_whitespace();
@@ -109,10 +140,44 @@ static void parse_string(jsonx::scanner &sc, std::string &s)
     while ((sc.cur_ch != '"') && !esc) {
         if (sc.eof())
             throw runtime_error("Premature EOF");
-        if ((sc.cur_ch == '\\') && !esc) {
-            esc = true;
-        } else {
-            is.put(sc.cur_ch);
+        if (!esc) {
+            if (sc.cur_ch != '\\') {
+                is.put(sc.cur_ch);
+            } else {
+                esc = true;
+            }
+        } else { // We have esc
+            switch (sc.cur_ch) {
+            case '0':
+                is.put('\0');
+                break;
+            case '"':
+                is.put('"');
+                break;
+            case '\\':
+                is.put('\\');
+                break;
+            case 'b':
+                is.put('\b');
+                break;
+            case 'f':
+                is.put('\f');
+                break;
+            case 'n':
+                is.put('\n');
+                break;
+            case 'r':
+                is.put('\r');
+                break;
+            case 't':
+                is.put('\t');
+                break;
+            case 'u': // Unicode not implemented for now
+                throw runtime_error("Unicode escape sequences not implemented for now");
+            default:
+                throw runtime_error("Invalid escape sequence '\\"
+                                    + chartostring(sc.cur_ch) + "'");
+            } // end switch //
             esc = false;
         }
         sc.get_ch();
