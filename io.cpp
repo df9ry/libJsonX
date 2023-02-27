@@ -128,62 +128,58 @@ static inline std::string chartostring(char c)
 static void parse_string(jsonx::scanner &sc, std::string &s)
 {
     sc.skip_whitespace();
-    if (sc.cur_ch != '"') {
-        char s[2];
-        s[0] = sc.cur_ch;
-        s[1] = '\0';
-        throw runtime_error(string("Expected ':', got '") + s + "'");
-    }
-    sc.get_ch();
-    bool esc{false};
+    if (sc.cur_ch != '"')
+        throw runtime_error(string("Expected ':', got '") +
+                            string((char*)&sc.cur_ch, 1) + "'");
     std::ostringstream is;
-    while ((sc.cur_ch != '"') && !esc) {
+    while (true) {
+        sc.get_ch();
         if (sc.eof())
             throw runtime_error("Premature EOF");
-        if (!esc) {
-            if (sc.cur_ch != '\\') {
-                is.put(sc.cur_ch);
-            } else {
-                esc = true;
-            }
-        } else { // We have esc
-            switch (sc.cur_ch) {
-            case '0':
-                is.put('\0');
-                break;
-            case '"':
-                is.put('"');
-                break;
-            case '\\':
-                is.put('\\');
-                break;
-            case 'b':
-                is.put('\b');
-                break;
-            case 'f':
-                is.put('\f');
-                break;
-            case 'n':
-                is.put('\n');
-                break;
-            case 'r':
-                is.put('\r');
-                break;
-            case 't':
-                is.put('\t');
-                break;
-            case 'u': // Unicode not implemented for now
-                throw runtime_error("Unicode escape sequences not implemented for now");
-            default:
-                throw runtime_error("Invalid escape sequence '\\"
-                                    + chartostring(sc.cur_ch) + "'");
-            } // end switch //
-            esc = false;
+        // End of string?:
+        if (sc.cur_ch == '"') {
+            sc.get_ch();
+            s = is.str();
+            return;
+        }
+        // Not escape?
+        if (sc.cur_ch != '\\') {
+            is.put(sc.cur_ch);
+            continue;
         }
         sc.get_ch();
+        switch (sc.cur_ch) {
+        case '0':
+            is.put('\0');
+            break;
+        case '"':
+            is.put('"');
+            break;
+        case '\\':
+            is.put('\\');
+            break;
+        case 'b':
+            is.put('\b');
+            break;
+        case 'f':
+            is.put('\f');
+            break;
+        case 'n':
+            is.put('\n');
+            break;
+        case 'r':
+            is.put('\r');
+            break;
+        case 't':
+            is.put('\t');
+            break;
+        case 'u': // Unicode not implemented for now
+            throw runtime_error("Unicode escape sequences not implemented for now");
+        default:
+            throw runtime_error("Invalid escape sequence '\\"
+                                + chartostring(sc.cur_ch) + "'");
+        } // end switch //
     } // end while //
-    sc.get_ch();
-    s = is.str();
 }
 
 static void parse_token(jsonx::scanner &sc, std::string &s)

@@ -1,0 +1,35 @@
+# Test configuration for Baukasten project
+{
+    "name": "Baukasten main test configuration",
+    "plugin_root": "./plugins", # Plugin root directory.
+    "plugins":
+    [ # Plugins to load.
+        { 
+            "name": "telnet", 
+            "path": "telnet/libbk_telnet.so", 
+            "services":
+            [
+                { "name": "admin", "ip-v": 6, "host": "localhost", "port": 3000,
+                  "target": "sys", "backlog": 1, "welcome": "*** Baukasten Konsole ***\n" }
+            ]
+        },
+        {
+            "name": "agw",
+            "path": "agw/libbk_agw.so",
+            "services":
+            [
+                { "name": "agw", "ip-v": 4, "host": "localhost", "port": 8000,
+                  "ver_major": 1000, "ver_minor": 1, "axports":
+                  [
+                    { "description": "Test Port" },
+                    { "description": "Zweiter Port" }
+                  ]
+                }
+            ]
+        },
+    ],
+    "launch":
+    [
+        "gnome-terminal -- telnet localhost 3000"
+    ]
+}

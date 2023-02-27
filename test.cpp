@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 #undef NDEBUG
 #include <assert.h>
@@ -483,6 +484,14 @@ int main(int, const char *[])
         }
         cout << "OK" << endl;
         cout << endl;
+
+        cout << "Testing IO:" << endl;
+        {
+            ifstream ifs;
+            json document;
+            ifs.open("./test.json");
+            document.parse(ifs);
+        }
 
         cout << "JsonX Test FINISHED" << endl;
         return EXIT_SUCCESS;
