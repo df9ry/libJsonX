@@ -1,9 +1,9 @@
-# Test configuration for Baukasten project
+// Test configuration for Baukasten project
 {
     "name": "Baukasten main test configuration",
-    "plugin_root": "./plugins", # Plugin root directory.
+    "plugin_root": "./plugins", // Plugin root directory.
     "plugins":
-    [ # Plugins to load.
+    [ // Plugins to load.
         { 
             "name": "telnet", 
             "path": "telnet/libbk_telnet.so", 

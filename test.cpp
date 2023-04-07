@@ -477,7 +477,7 @@ int main(int, const char *[])
         cout << "Testing comments:" << endl;
         {
             json x;
-            x.parse("[\"A\" # Element A\n \n##Kommentarzeile \n , \"B\"]#Schluß");
+            x.parse("[\"A\" // Element A\n \n//##Kommentarzeile \n , \"B\"]//Schluß");
             assert(x.size() == 2);
             assert(x[0] == "A");
             assert(x[1] == "B");

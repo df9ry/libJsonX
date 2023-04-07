@@ -12,6 +12,7 @@ public:
     scanner(std::istream &_is): is{_is}
     {
         get_ch();
+        get_ch();
     }
 
     bool eof() const { return cur_ch == EOF; }
@@ -20,7 +21,8 @@ public:
     {
         if (eof())
             return;
-        cur_ch = is.get();
+        cur_ch = next_ch;
+        next_ch = is.get();
         if (eof())
             return;
         if (cur_ch == '\n') {
@@ -38,7 +40,7 @@ public:
                 if (cur_ch == '\n')
                     in_comment = false;
             } else if (!std::isspace(static_cast<unsigned char>(cur_ch))) {
-                if (cur_ch == '#')
+                if ((cur_ch == '/') && (next_ch == '/'))
                     in_comment = true;
                 else
                     return;
@@ -50,6 +52,7 @@ public:
     int cur_ch{0x00};
     int cur_line{1};
     int cur_col{0};
+    int next_ch{0x00};
 
 private:
     std::istream &is;
